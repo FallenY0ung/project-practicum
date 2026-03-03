@@ -43,7 +43,7 @@ jobs:
           cache: gradle
 
       - name: Fake linter
-       run: echo 'LINTLINTLINTLINTLINTLINT'
+        run: echo 'LINTLINTLINTLINTLINTLINT'
 
       # - name: Linter
       #   run: ./gradlew --no-daemon spotlessCheck
