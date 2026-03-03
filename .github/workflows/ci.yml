@@ -23,4 +23,4 @@ jobs:
 
       # Сборка, во время которой вызовется и линтер (если нужно отдельно от check)
       - name: Build
-        run: ./gradlew --no-daemon build
+        run: chmod +x ./gradlew && ./gradlew --no-daemon build
