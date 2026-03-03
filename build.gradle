@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'com.diffplug.spotless'
+    id 'com.diffplug.spotless' version '8.3.0'
 }
 
 group = 'ru.tbank.practicum'
