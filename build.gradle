@@ -29,8 +29,7 @@ test {
 
 spotless {
     java {
-        googleJavaFormat()
-        removeUnusedImports()
+        palantirJavaFormat().formatJavadoc(true)
     }
 }
 
