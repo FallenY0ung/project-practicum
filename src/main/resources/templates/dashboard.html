@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Smart Home</title>
+</head>
+<body>
+<h1>Smart Home Dashboard</h1>
+
+<h2>Батарея</h2>
+<p>Целевая температура: <b th:text="${temp}"></b> °C</p>
+<form method="post" action="/radiator">
+    <input type="number" name="temp" min="10" max="35" />
+    <button type="submit">Установить</button>
+</form>
+
+<h2>Жалюзи</h2>
+<p>Состояние: <b th:text="${blinds}"></b></p>
+<form method="post" action="/blinds">
+    <select name="state">
+        <option value="OPEN">OPEN</option>
+        <option value="CLOSED">CLOSED</option>
+    </select>
+    <button type="submit">Применить</button>
+</form>
+
+<h2>Расписание штор</h2>
+<p th:text="${schedule}"></p>
+<form method="post" action="/curtains/schedule">
+    <label>Open (HH:mm): <input name="openAt" value="08:00"/></label><br/>
+    <label>Close (HH:mm): <input name="closeAt" value="21:00"/></label><br/>
+    <label>Enabled: <input type="checkbox" name="enabled"/></label><br/>
+    <button type="submit">Сохранить расписание</button>
+</form>
+
+</body>
+</html>

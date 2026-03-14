@@ -1,0 +1,9 @@
+weather:
+  base-url: "https://api.openweathermap.org"
+  api-key: "your_api_key"
+  city: "Moscow"
+  poll-interval: "PT1M"
+
+logging:
+  level:
+    ru.tbank.practicum: DEBUG
