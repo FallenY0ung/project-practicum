@@ -2,7 +2,7 @@ weather:
   base-url: "https://api.openweathermap.org"
   api-key: "e1572cabddc662b38654338d33d67415"
   city: "Saratov"
-  poll-interval: "PT1M"
+  poll-interval: 1m
 
 logging:
   level:

@@ -1,25 +1,24 @@
 package ru.tbank.practicum.controller.web;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
+import java.util.concurrent.atomic.AtomicInteger;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.tbank.practicum.dto.CurtainsSchedule;
+import ru.tbank.practicum.exception.CurtainsScheduleException;
 import ru.tbank.practicum.model.BlindsState;
 import ru.tbank.practicum.service.SmartHomeService;
 
 @Controller
+@RequiredArgsConstructor
 public class DashboardController {
 
     private final SmartHomeService smartHomeService;
-
-    public DashboardController(SmartHomeService smartHomeService) {
-        this.smartHomeService = smartHomeService;
-    }
 
     @GetMapping("/")
     public String dashboard(Model model) {
@@ -30,7 +29,7 @@ public class DashboardController {
     }
 
     @PostMapping("/radiator")
-    public String setRadiator(@RequestParam @Min(10) @Max(35) int temp) {
+    public String setRadiator(@RequestParam AtomicInteger temp) {
         smartHomeService.setRadiatorTargetTemp(temp);
         return "redirect:/";
     }
@@ -46,7 +45,12 @@ public class DashboardController {
             @RequestParam String openAt,
             @RequestParam String closeAt,
             @RequestParam(defaultValue = "false") boolean enabled) {
-        smartHomeService.setSchedule(new CurtainsSchedule(LocalTime.parse(openAt), LocalTime.parse(closeAt), enabled));
-        return "redirect:/";
+        try {
+            smartHomeService.setSchedule(
+                    new CurtainsSchedule(LocalTime.parse(openAt), LocalTime.parse(closeAt), enabled));
+            return "redirect:/";
+        } catch (DateTimeParseException e) {
+            throw new CurtainsScheduleException("Некорректный формат времени. Используй HH:mm");
+        }
     }
 }

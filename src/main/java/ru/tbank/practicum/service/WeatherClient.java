@@ -1,28 +1,31 @@
 package ru.tbank.practicum.service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestClient;
 import ru.tbank.practicum.dto.GeocodingLocation;
 import ru.tbank.practicum.dto.OpenWeatherResponse;
 import ru.tbank.practicum.dto.WeatherProperties;
+import ru.tbank.practicum.exceptionHandler.WeatherRateLimitException;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class WeatherClient {
-    private static final Logger log = LoggerFactory.getLogger(WeatherClient.class);
 
     private final RestClient restClient;
     private final WeatherProperties props;
+    public static final ParameterizedTypeReference<List<GeocodingLocation>> geocodinListType =
+            new ParameterizedTypeReference<>() {};
 
-    public WeatherClient(RestClient restClient, WeatherProperties props) {
-        this.restClient = restClient;
-        this.props = props;
-    }
-
+    @Retryable(includes = WeatherRateLimitException.class, maxRetries = 10, delay = 1000)
     public OpenWeatherResponse getCurrent(String city) {
         log.info("Requesting geocoding for city {}", city);
 
@@ -45,10 +48,12 @@ public class WeatherClient {
                     throw new RuntimeException("Invalid OpenWeather API key");
                 })
                 .onStatus(s -> s.value() == 429, (req, res) -> {
-                    throw new RuntimeException("Rate limit from weather API (429)");
+                    throw new WeatherRateLimitException("Rate limit from weather API (429)");
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    throw new RuntimeException("Weather API is unavailable: " + res.getStatusCode());
+                    String errorBody = StreamUtils.copyToString(res.getBody(), StandardCharsets.UTF_8);
+                    throw new RuntimeException(
+                            "Weather API is unavailable: " + res.getStatusCode() + ", body=" + errorBody);
                 })
                 .body(OpenWeatherResponse.class);
 
@@ -56,6 +61,7 @@ public class WeatherClient {
         return responseBody;
     }
 
+    @Retryable(includes = WeatherRateLimitException.class, maxRetries = 10, delay = 1000)
     private GeocodingLocation findLocation(String city) {
         List<GeocodingLocation> locations = restClient
                 .get()
@@ -70,12 +76,14 @@ public class WeatherClient {
                     throw new RuntimeException("Invalid OpenWeather API key");
                 })
                 .onStatus(s -> s.value() == 429, (req, res) -> {
-                    throw new RuntimeException("Rate limit from geocoding API (429)");
+                    throw new WeatherRateLimitException("Rate limit from geocoding API (429)");
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    throw new RuntimeException("Geocoding API is unavailable: " + res.getStatusCode());
+                    String errorBody = StreamUtils.copyToString(res.getBody(), StandardCharsets.UTF_8);
+                    throw new RuntimeException(
+                            "Geocoding API is unavailable: " + res.getStatusCode() + ", body=" + errorBody);
                 })
-                .body(new ParameterizedTypeReference<List<GeocodingLocation>>() {});
+                .body(geocodinListType);
 
         if (locations == null || locations.isEmpty()) {
             throw new RuntimeException("City not found: " + city);

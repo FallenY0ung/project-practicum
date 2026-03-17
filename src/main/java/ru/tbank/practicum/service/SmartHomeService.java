@@ -1,48 +1,46 @@
 package ru.tbank.practicum.service;
 
 import java.time.LocalTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.tbank.practicum.dto.CurtainsSchedule;
 import ru.tbank.practicum.model.BlindsState;
 
 @Service
+@Slf4j
 public class SmartHomeService {
 
-    private static final Logger log = LoggerFactory.getLogger(SmartHomeService.class);
-
-    private int radiatorTargetTemp = 22;
-    private BlindsState blindsState = BlindsState.CLOSED;
-    private CurtainsSchedule schedule = new CurtainsSchedule(LocalTime.of(8, 0), LocalTime.of(21, 0), false);
+    private final AtomicInteger radiatorTargetTemp = new AtomicInteger(22);
+    private final AtomicReference<BlindsState> blindsState = new AtomicReference<>(BlindsState.CLOSED);
+    private final AtomicReference<CurtainsSchedule> schedule =
+            new AtomicReference<>(new CurtainsSchedule(LocalTime.of(8, 0), LocalTime.of(21, 0), false));
 
     public int getRadiatorTargetTemp() {
-        return radiatorTargetTemp;
+        return radiatorTargetTemp.get();
     }
 
     public BlindsState getBlindsState() {
-        return blindsState;
+        return blindsState.get();
     }
 
     public CurtainsSchedule getSchedule() {
-        return schedule;
+        return schedule.get();
     }
 
-    public void setRadiatorTargetTemp(int newTemp) {
-        int old = radiatorTargetTemp;
-        radiatorTargetTemp = newTemp;
+    public void setRadiatorTargetTemp(AtomicInteger newTemp) {
+        int old = radiatorTargetTemp.getAndSet(newTemp.get());
         log.info("Radiator target temp changed: {} -> {}", old, newTemp);
     }
 
     public void setBlindsState(BlindsState newState) {
-        BlindsState old = blindsState;
-        blindsState = newState;
+        BlindsState old = blindsState.getAndSet(newState);
         log.info("Blinds state changed: {} -> {}", old, newState);
     }
 
     public void setSchedule(CurtainsSchedule newSchedule) {
-        CurtainsSchedule old = schedule;
-        schedule = newSchedule;
+        CurtainsSchedule old = schedule.getAndSet(newSchedule);
         log.info("Curtains schedule changed: {} -> {}", old, newSchedule);
     }
 }
