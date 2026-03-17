@@ -18,6 +18,7 @@ import ru.tbank.practicum.service.SmartHomeService;
 @RequiredArgsConstructor
 public class DashboardController {
 
+    // для фейк коммита
     private final SmartHomeService smartHomeService;
 
     @GetMapping("/")
