@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Страница не найдена</title>
+  <link rel="stylesheet" th:href="@{/css/error404.css}">
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <div class="emoji">🌦️</div>
+    <div class="code">404</div>
+    <h1 class="title">Страница не найдена</h1>
+    <p class="subtitle">
+      Похоже, такой страницы не существует или адрес был введён неправильно.
+      Возможно, она ушла искать хорошую погоду.
+    </p>
+
+    <div class="actions">
+      <a href="/" class="btn btn-primary">На главную</a>
+      <a href="javascript:history.back()" class="btn btn-secondary">Назад</a>
+    </div>
+
+    <p class="hint">
+      Проверь адрес страницы или вернись в меню поиска погоды.
+    </p>
+  </div>
+</div>
+</body>
+</html>

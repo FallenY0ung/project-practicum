@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Ошибка расписания</title>
+</head>
+<body>
+<h1>Ошибка при сохранении расписания штор</h1>
+
+<p th:text="${errorMessage}">
+  Некорректный формат времени
+</p>
+
+<p>
+  Пожалуйста, введите время в формате <b>HH:mm</b>.
+</p>
+
+<p>
+  Примеры:
+</p>
+<ul>
+  <li>08:00</li>
+  <li>21:30</li>
+  <li>07:45</li>
+</ul>
+
+<a th:href="@{/}">Вернуться на главную</a>
+</body>
+</html>
