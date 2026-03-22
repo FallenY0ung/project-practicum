@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.tbank.practicum.dto.CurtainsSchedule;
-import ru.tbank.practicum.model.BlindsState;
+import ru.tbank.practicum.enums.BlindsState;
 
 @Service
 @Slf4j

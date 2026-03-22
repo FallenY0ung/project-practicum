@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.tbank.practicum.dto.CurtainsSchedule;
 import ru.tbank.practicum.exception.CurtainsScheduleException;
-import ru.tbank.practicum.model.BlindsState;
+import ru.tbank.practicum.enums.BlindsState;
 import ru.tbank.practicum.service.SmartHomeService;
 
 @Controller
