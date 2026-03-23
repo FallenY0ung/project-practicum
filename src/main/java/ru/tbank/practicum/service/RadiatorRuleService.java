@@ -40,6 +40,28 @@ public class RadiatorRuleService {
         return radiatorRuleRepository.findByRadiatorIdAndEnabledTrue(radiatorId);
     }
 
+    @Transactional(readOnly = true)
+    public List<RadiatorRule> getByRadiatorId(Long radiatorId) {
+        return radiatorRuleRepository.findByRadiatorId(radiatorId);
+    }
+
+    public void deleteById(Long id, EventSource source) {
+        RadiatorRule radiatorRule = getById(id);
+
+        log.info("Deleting radiator rule {}", id);
+
+        logService.createLog(
+                DeviceType.RADIATOR,
+                radiatorRule.getId(),
+                LogStatus.WARNING,
+                source,
+                "DELETE_RADIATOR_RULE",
+                "Radiator rule was deleted"
+        );
+
+        radiatorRuleRepository.delete(radiatorRule);
+    }
+
     public RadiatorRule save(RadiatorRule radiatorRule) {
         validateRule(
                 radiatorRule.getMinOutsideTemp(),

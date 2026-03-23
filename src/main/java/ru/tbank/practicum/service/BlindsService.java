@@ -7,8 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tbank.practicum.entity.Blinds;
+import ru.tbank.practicum.entity.Schedule;
 import ru.tbank.practicum.enums.*;
 import ru.tbank.practicum.repositories.BlindsRepository;
+import ru.tbank.practicum.repositories.ScheduleRepository;
 
 import java.util.List;
 
@@ -21,6 +23,7 @@ public class BlindsService {
     private final BlindsRepository blindsRepository;
     private final DeviceEventService deviceEventService;
     private final LogService logService;
+    private final ScheduleRepository scheduleRepository;
 
     @Transactional(readOnly = true)
     public Blinds getById(Long id) {
@@ -31,6 +34,11 @@ public class BlindsService {
     @Transactional(readOnly = true)
     public List<Blinds> getAll() {
         return blindsRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Schedule> getByBlindsId(Long blindsId){
+        return scheduleRepository.findByBlindsId(blindsId);
     }
 
     public Blinds save(Blinds blinds) {
@@ -48,6 +56,27 @@ public class BlindsService {
         );
 
         return saved;
+    }
+
+    public void deleteById(Long id) {
+        Blinds blinds = getById(id);
+
+        if (!scheduleRepository.findByBlindsIdAndEnabledTrue(id).isEmpty()) {
+            throw new IllegalStateException("Cannot delete blinds with existing schedule");
+        }
+
+        log.info("Deleting blinds {}", id);
+
+        logService.createLog(
+                DeviceType.BLINDS,
+                blinds.getId(),
+                LogStatus.WARNING,
+                EventSource.USER,
+                "DELETE_BLINDS",
+                "Blinds were deleted"
+        );
+
+        blindsRepository.delete(blinds);
     }
 
     public Blinds updateState(Long id, BlindsState newState, EventSource source) {
@@ -185,5 +214,27 @@ public class BlindsService {
             case CLOSED -> EventType.BLINDS_CLOSED;
             case HALF_OPEN -> EventType.BLINDS_HALF_OPENED;
         };
+    }
+
+    public Blinds updateFromForm(Long id, Blinds updatedBlinds, EventSource source) {
+        Blinds current = getById(id);
+
+        if (current.getState() != updatedBlinds.getState()) {
+            updateState(id, updatedBlinds.getState(), source);
+        }
+
+        if (!current.getIsOnline().equals(updatedBlinds.getIsOnline())) {
+            changeOnlineStatus(id, updatedBlinds.getIsOnline(), source);
+        }
+
+        if (!current.getIsBroken().equals(updatedBlinds.getIsBroken())) {
+            if (Boolean.TRUE.equals(updatedBlinds.getIsBroken())) {
+                markAsBroken(id, source);
+            } else {
+                restore(id, source);
+            }
+        }
+
+        return getById(id);
     }
 }

@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface RadiatorRuleRepository extends JpaRepository<RadiatorRule, Long> {
     List<RadiatorRule> findByRadiatorIdAndEnabledTrue(Long radiatorId);
+    List<RadiatorRule> findByRadiatorId(Long radiatorId);
 }

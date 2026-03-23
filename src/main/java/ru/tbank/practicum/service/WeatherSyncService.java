@@ -15,14 +15,12 @@ public class WeatherSyncService {
 
     private final WeatherClient weatherClient;
     private final WeatherRepository weatherRepository;
-    private final LogService logService;
 
     @Transactional
     public Weather fetchAndSaveCurrentWeather(String city) {
         OpenWeatherResponse response = weatherClient.getCurrent(city);
 
         Weather weather = mapToEntity(response);
-
         Weather saved = weatherRepository.save(weather);
 
         log.info("Weather saved for city {}", city);
@@ -31,11 +29,15 @@ public class WeatherSyncService {
     }
 
     private Weather mapToEntity(OpenWeatherResponse response) {
+        String description = response.weather() != null && !response.weather().isEmpty()
+                ? response.weather().getFirst().description()
+                : "Нет описания";
+
         return Weather.builder()
                 .temp(response.main().temp())
                 .feelsLike(response.main().feelsLike())
                 .name(response.name())
-                .description(response.weather().getFirst().description())
+                .description(description)
                 .pressure(Long.valueOf(response.main().pressure()))
                 .humidity(Long.valueOf(response.main().humidity()))
                 .windSpeed(response.wind().speed())

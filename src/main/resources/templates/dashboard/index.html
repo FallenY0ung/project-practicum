@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard — Smart Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="page">
+  <header class="dashboard-hero">
+    <div class="dashboard-hero__content">
+      <p class="eyebrow">Smart Home Control Center</p>
+      <h1>Панель управления умным домом</h1>
+      <p class="subtitle">
+        Единая точка входа для устройств, правил, расписаний, погоды и автоматизации.
+      </p>
+
+      <div class="dashboard-hero__actions">
+        <a class="btn btn-primary" th:href="@{/radiators}">Радиаторы</a>
+        <a class="btn btn-secondary" th:href="@{/blinds}">Жалюзи</a>
+        <a class="btn btn-secondary" th:href="@{/weather}">Погода</a>
+      </div>
+    </div>
+
+    <div class="dashboard-orbit">
+      <div class="orbit-card orbit-card--main">
+        <span class="orbit-label">Город</span>
+        <span class="orbit-value" th:text="${city}">Saratov</span>
+      </div>
+
+      <div class="orbit-card orbit-card--small" th:if="${latestWeather != null}">
+        <span class="orbit-label">Температура</span>
+        <span class="orbit-value" th:text="${latestWeather.temp} + ' °C'">0 °C</span>
+      </div>
+
+      <div class="orbit-card orbit-card--small" th:if="${latestWeather != null}">
+        <span class="orbit-label">Описание</span>
+        <span class="orbit-value" th:text="${latestWeather.description}">Облачно</span>
+      </div>
+    </div>
+  </header>
+
+  <div th:if="${successMessage}" class="alert-success" th:text="${successMessage}">
+    Успешно выполнено
+  </div>
+
+  <section class="dashboard-stats">
+    <div class="stat-card">
+      <span class="stat-title">Радиаторы</span>
+      <span class="stat-value" th:text="${radiatorsCount}">0</span>
+      <a class="stat-link" th:href="@{/radiators}">Открыть раздел</a>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-title">Жалюзи</span>
+      <span class="stat-value" th:text="${blindsCount}">0</span>
+      <a class="stat-link" th:href="@{/blinds}">Открыть раздел</a>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-title">Правила радиаторов</span>
+      <span class="stat-value" th:text="${rulesCount}">0</span>
+      <a class="stat-link" th:href="@{/radiators}">Смотреть радиаторы</a>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-title">Расписания жалюзи</span>
+      <span class="stat-value" th:text="${schedulesCount}">0</span>
+      <a class="stat-link" th:href="@{/blinds}">Смотреть жалюзи</a>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-title">Записи погоды</span>
+      <span class="stat-value" th:text="${weatherCount}">0</span>
+      <a class="stat-link" th:href="@{/weather}">Открыть погоду</a>
+    </div>
+  </section>
+
+  <section class="dashboard-grid">
+    <section class="card dashboard-panel">
+      <div class="card-header">
+        <h2>Быстрые действия</h2>
+      </div>
+
+      <div class="quick-actions">
+        <form th:action="@{/dashboard/weather/sync}" method="post">
+          <button class="action-tile" type="submit">
+            <span class="action-icon">☁</span>
+            <span class="action-title">Обновить погоду</span>
+            <span class="action-subtitle">Загрузить актуальные данные и сохранить в БД</span>
+          </button>
+        </form>
+
+        <form th:action="@{/dashboard/sync/radiators}" method="post">
+          <button class="action-tile" type="submit">
+            <span class="action-icon">♨</span>
+            <span class="action-title">Применить правила радиаторов</span>
+            <span class="action-subtitle">Пересчитать температуру по последней погоде</span>
+          </button>
+        </form>
+
+        <form th:action="@{/dashboard/sync/blinds}" method="post">
+          <button class="action-tile" type="submit">
+            <span class="action-icon">▥</span>
+            <span class="action-title">Проверить расписания жалюзи</span>
+            <span class="action-subtitle">Синхронизировать состояние по текущему времени</span>
+          </button>
+        </form>
+
+        <form th:action="@{/dashboard/sync/all}" method="post">
+          <button class="action-tile action-tile--accent" type="submit">
+            <span class="action-icon">⚡</span>
+            <span class="action-title">Полная синхронизация</span>
+            <span class="action-subtitle">Погода, правила и расписания за один запуск</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <section class="card dashboard-panel">
+      <div class="card-header">
+        <h2>Последняя погода</h2>
+      </div>
+
+      <div th:if="${latestWeather == null}" class="empty-state compact-empty">
+        <p>Данные о погоде пока отсутствуют.</p>
+      </div>
+
+      <div th:if="${latestWeather != null}" class="weather-grid">
+        <div class="weather-item">
+          <span class="weather-label">Город</span>
+          <span class="weather-value" th:text="${latestWeather.name}">Saratov</span>
+        </div>
+
+        <div class="weather-item">
+          <span class="weather-label">Температура</span>
+          <span class="weather-value" th:text="${latestWeather.temp} + ' °C'">0 °C</span>
+        </div>
+
+        <div class="weather-item">
+          <span class="weather-label">Ощущается как</span>
+          <span class="weather-value" th:text="${latestWeather.feelsLike} + ' °C'">0 °C</span>
+        </div>
+
+        <div class="weather-item">
+          <span class="weather-label">Описание</span>
+          <span class="weather-value" th:text="${latestWeather.description}">Ясно</span>
+        </div>
+
+        <div class="weather-item">
+          <span class="weather-label">Влажность</span>
+          <span class="weather-value" th:text="${latestWeather.humidity} + ' %'">60 %</span>
+        </div>
+
+        <div class="weather-item">
+          <span class="weather-label">Ветер</span>
+          <span class="weather-value" th:text="${latestWeather.windSpeed} + ' м/с'">2.4 м/с</span>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section class="card section-spacing">
+    <div class="card-header">
+      <h2>Навигация по системе</h2>
+    </div>
+
+    <div class="menu-grid">
+      <a class="menu-card" th:href="@{/radiators}">
+        <span class="menu-card__title">Радиаторы</span>
+        <span class="menu-card__text">Создание устройств, настройка состояний и правил.</span>
+      </a>
+
+      <a class="menu-card" th:href="@{/blinds}">
+        <span class="menu-card__title">Жалюзи</span>
+        <span class="menu-card__text">Управление состоянием жалюзи и их расписаниями.</span>
+      </a>
+
+      <a class="menu-card" th:href="@{/weather}">
+        <span class="menu-card__title">Погода</span>
+        <span class="menu-card__text">История погодных записей и ручная синхронизация.</span>
+      </a>
+    </div>
+  </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Погода</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Smart Home</p>
+      <h1>Погода</h1>
+      <p class="subtitle">
+        Текущая погода и история сохраненных записей
+        <span th:if="${city != null}" th:text="'для города ' + ${city}">для города</span>
+      </p>
+    </div>
+
+    <form th:action="@{/weather/sync}" method="post">
+      <button type="submit" class="btn btn-primary">Обновить погоду</button>
+    </form>
+  </header>
+
+  <section class="card">
+    <div class="card-header">
+      <h2>Последняя запись</h2>
+    </div>
+
+    <div th:if="${latestWeather == null}" class="empty-state compact-empty">
+      <p>Погодные данные еще не загружались.</p>
+    </div>
+
+    <div th:if="${latestWeather != null}" class="weather-grid">
+      <div class="weather-item">
+        <span class="weather-label">Город</span>
+        <span class="weather-value" th:text="${latestWeather.name}">Саратов</span>
+      </div>
+
+      <div class="weather-item">
+        <span class="weather-label">Температура</span>
+        <span class="weather-value" th:text="${latestWeather.temp} + ' °C'">0 °C</span>
+      </div>
+
+      <div class="weather-item">
+        <span class="weather-label">Ощущается как</span>
+        <span class="weather-value" th:text="${latestWeather.feelsLike} + ' °C'">0 °C</span>
+      </div>
+
+      <div class="weather-item">
+        <span class="weather-label">Описание</span>
+        <span class="weather-value" th:text="${latestWeather.description}">Облачно</span>
+      </div>
+
+      <div class="weather-item">
+        <span class="weather-label">Давление</span>
+        <span class="weather-value" th:text="${latestWeather.pressure} + ' hPa'">1024 hPa</span>
+      </div>
+
+      <div class="weather-item">
+        <span class="weather-label">Влажность</span>
+        <span class="weather-value" th:text="${latestWeather.humidity} + ' %'">69 %</span>
+      </div>
+
+      <div class="weather-item">
+        <span class="weather-label">Скорость ветра</span>
+        <span class="weather-value" th:text="${latestWeather.windSpeed} + ' м/с'">2.4 м/с</span>
+      </div>
+
+      <div class="weather-item">
+        <span class="weather-label">Сохранено</span>
+        <span class="weather-value"
+              th:text="${#temporals.format(latestWeather.recordedAt, 'dd.MM.yyyy HH:mm')}">23.03.2026 21:00</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card section-spacing">
+    <div class="card-header">
+      <h2>История погоды</h2>
+      <span class="badge" th:text="${#lists.size(weatherHistory)} + ' записей'">0 записей</span>
+    </div>
+
+    <div th:if="${#lists.isEmpty(weatherHistory)}" class="empty-state compact-empty">
+      <p>История погоды пока пуста.</p>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(weatherHistory)}" class="table-wrapper">
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Город</th>
+          <th>Температура</th>
+          <th>Ощущается как</th>
+          <th>Описание</th>
+          <th>Давление</th>
+          <th>Влажность</th>
+          <th>Ветер</th>
+          <th>Время</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="weather : ${weatherHistory}">
+          <td th:text="${weather.id}">1</td>
+          <td th:text="${weather.name}">Саратов</td>
+          <td th:text="${weather.temp} + ' °C'">0 °C</td>
+          <td th:text="${weather.feelsLike} + ' °C'">0 °C</td>
+          <td th:text="${weather.description}">Облачно</td>
+          <td th:text="${weather.pressure}">1024</td>
+          <td th:text="${weather.humidity} + ' %'">69 %</td>
+          <td th:text="${weather.windSpeed} + ' м/с'">2.4 м/с</td>
+          <td th:text="${#temporals.format(weather.recordedAt, 'dd.MM.yyyy HH:mm')}">23.03.2026 21:00</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+</body>
+</html>

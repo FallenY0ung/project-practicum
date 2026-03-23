@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Blinds</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Smart Home</p>
+      <h1>Жалюзи</h1>
+      <p class="subtitle">Управление жалюзи в системе умного дома</p>
+    </div>
+
+    <a class="btn btn-primary" th:href="@{/blinds/new}">+ Добавить жалюзи</a>
+  </header>
+
+  <section class="card">
+    <div class="card-header">
+      <h2>Список жалюзи</h2>
+      <span class="badge" th:text="${#lists.size(blindsList)} + ' шт.'">0 шт.</span>
+    </div>
+
+    <div th:if="${#lists.isEmpty(blindsList)}" class="empty-state">
+      <p>Жалюзи пока не добавлены.</p>
+      <a class="btn btn-primary" th:href="@{/blinds/new}">Создать первые жалюзи</a>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(blindsList)}" class="table-wrapper">
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Состояние</th>
+          <th>Онлайн</th>
+          <th>Сломаны</th>
+          <th>Обновлены</th>
+          <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="blinds : ${blindsList}">
+          <td th:text="${blinds.id}">1</td>
+          <td th:text="${blinds.state}">OPEN</td>
+
+          <td>
+                        <span class="status-pill status-success"
+                              th:if="${blinds.isOnline}">Да</span>
+            <span class="status-pill status-muted"
+                  th:unless="${blinds.isOnline}">Нет</span>
+          </td>
+
+          <td>
+                        <span class="status-pill status-danger"
+                              th:if="${blinds.isBroken}">Да</span>
+            <span class="status-pill status-success"
+                  th:unless="${blinds.isBroken}">Нет</span>
+          </td>
+
+          <td th:text="${#temporals.format(blinds.updatedAt, 'dd.MM.yyyy HH:mm')}">-</td>
+
+          <td>
+            <div class="actions">
+              <a class="btn btn-secondary"
+                 th:href="@{/blinds/{id}/edit(id=${blinds.id})}">
+                Редактировать
+              </a>
+
+              <form th:action="@{/blinds/{id}/delete(id=${blinds.id})}" method="post"
+                    onsubmit="return confirm('Удалить жалюзи?');">
+                <button type="submit" class="btn btn-danger">Удалить</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+</body>
+</html>

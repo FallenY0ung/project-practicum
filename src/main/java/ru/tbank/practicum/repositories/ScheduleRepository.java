@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findByBlindsIdAndEnabledTrue(Long blindsId);
+    List<Schedule> findByBlindsId(Long blindsId);
 }

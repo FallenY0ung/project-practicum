@@ -7,11 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tbank.practicum.entity.Radiator;
+import ru.tbank.practicum.entity.RadiatorRule;
 import ru.tbank.practicum.enums.DeviceType;
 import ru.tbank.practicum.enums.EventSource;
 import ru.tbank.practicum.enums.EventType;
 import ru.tbank.practicum.enums.LogStatus;
 import ru.tbank.practicum.repositories.RadiatorRepository;
+import ru.tbank.practicum.repositories.RadiatorRuleRepository;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -24,6 +27,7 @@ public class RadiatorService {
     private final RadiatorRepository radiatorRepository;
     private final DeviceEventService deviceEventService;
     private final LogService logService;
+    private final RadiatorRuleRepository radiatorRuleRepository;
 
     @Transactional(readOnly = true)
     public Radiator getById(Long id) {
@@ -36,7 +40,12 @@ public class RadiatorService {
         return radiatorRepository.findAll();
     }
 
-    public Radiator save(Radiator radiator) {
+    @Transactional(readOnly = true)
+    public List<RadiatorRule> getByRadiatorId(Long radiatorId){
+        return radiatorRuleRepository.findByRadiatorId(radiatorId);
+    }
+
+    public Radiator save(Radiator radiator, EventSource eventSource) {
         Radiator saved = radiatorRepository.save(radiator);
 
         log.info("Radiator created: id={}, temp={}", saved.getId(), saved.getTemp());
@@ -45,12 +54,34 @@ public class RadiatorService {
                 DeviceType.RADIATOR,
                 saved.getId(),
                 LogStatus.SUCCESS,
-                EventSource.SYSTEM,
+                eventSource,
                 "CREATE_RADIATOR",
                 "Radiator was created successfully"
         );
 
         return saved;
+    }
+
+    public void deleteById(Long id) {
+        Radiator radiator = getById(id);
+
+        if (!radiatorRuleRepository.findByRadiatorIdAndEnabledTrue(id).isEmpty()) {
+            throw new IllegalStateException("Cannot delete radiator with existing rules");
+        }
+
+        log.info("Deleting radiator {}", id);
+
+
+        logService.createLog(
+                DeviceType.RADIATOR,
+                radiator.getId(),
+                LogStatus.WARNING,
+                EventSource.USER,
+                "DELETE_RADIATOR",
+                "Radiator was deleted"
+        );
+
+        radiatorRepository.delete(radiator);
     }
 
     public Radiator updateTemperature(Long id, BigDecimal newTemp, EventSource source) {
@@ -185,4 +216,26 @@ public class RadiatorService {
 
         return radiator;
     }
+
+    public void updateFromForm(Long id, Radiator updatedRadiator, EventSource source) {
+        Radiator current = getById(id);
+
+        if (current.getTemp().compareTo(updatedRadiator.getTemp()) != 0) {
+            updateTemperature(id, updatedRadiator.getTemp(), source);
+        }
+
+        if (!current.getIsBroken().equals(updatedRadiator.getIsBroken())) {
+            if (Boolean.TRUE.equals(updatedRadiator.getIsBroken())) {
+                markAsBroken(id, source);
+            } else {
+                restore(id, source);
+            }
+        }
+
+        if (!current.getIsOnline().equals(updatedRadiator.getIsOnline())) {
+            changeOnlineStatus(id, updatedRadiator.getIsOnline(), source);
+        }
+    }
+
+
 }

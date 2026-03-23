@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.tbank.practicum.entity.RadiatorRule;
 import ru.tbank.practicum.entity.Schedule;
 import ru.tbank.practicum.enums.DeviceType;
 import ru.tbank.practicum.enums.EventSource;
@@ -37,6 +38,30 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public List<Schedule> getActiveByBlindsId(Long blindsId) {
         return scheduleRepository.findByBlindsIdAndEnabledTrue(blindsId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Schedule> getByBlindsId(Long blindsId){
+        return scheduleRepository.findByBlindsId(blindsId);
+    }
+
+    public void deleteById(Long id, EventSource source) {
+        Schedule schedule = getById(id);
+
+        log.info("Deleting radiator rule {}", id);
+
+
+
+        logService.createLog(
+                DeviceType.RADIATOR,
+                schedule.getId(),
+                LogStatus.WARNING,
+                source,
+                "DELETE_RADIATOR_RULE",
+                "Radiator rule was deleted"
+        );
+
+        scheduleRepository.delete(schedule);
     }
 
     public Schedule save(Schedule schedule) {
