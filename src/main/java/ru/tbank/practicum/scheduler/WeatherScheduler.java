@@ -4,13 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import ru.tbank.practicum.dto.OpenWeatherResponse;
 import ru.tbank.practicum.dto.WeatherProperties;
 import ru.tbank.practicum.service.SmartHomeService;
-import ru.tbank.practicum.service.WeatherClient;
 import ru.tbank.practicum.service.WeatherSyncService;
-
-import java.math.BigDecimal;
 
 @Component
 @RequiredArgsConstructor

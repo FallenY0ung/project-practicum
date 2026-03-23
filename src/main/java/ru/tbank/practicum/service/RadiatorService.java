@@ -1,7 +1,8 @@
 package ru.tbank.practicum.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
+import java.math.BigDecimal;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,9 +15,6 @@ import ru.tbank.practicum.enums.EventType;
 import ru.tbank.practicum.enums.LogStatus;
 import ru.tbank.practicum.repositories.RadiatorRepository;
 import ru.tbank.practicum.repositories.RadiatorRuleRepository;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 @Transactional
@@ -31,7 +29,8 @@ public class RadiatorService {
 
     @Transactional(readOnly = true)
     public Radiator getById(Long id) {
-        return radiatorRepository.findById(id)
+        return radiatorRepository
+                .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Radiator with id " + id + " not found"));
     }
 
@@ -41,7 +40,7 @@ public class RadiatorService {
     }
 
     @Transactional(readOnly = true)
-    public List<RadiatorRule> getByRadiatorId(Long radiatorId){
+    public List<RadiatorRule> getByRadiatorId(Long radiatorId) {
         return radiatorRuleRepository.findByRadiatorId(radiatorId);
     }
 
@@ -56,8 +55,7 @@ public class RadiatorService {
                 LogStatus.SUCCESS,
                 eventSource,
                 "CREATE_RADIATOR",
-                "Radiator was created successfully"
-        );
+                "Radiator was created successfully");
 
         return saved;
     }
@@ -71,15 +69,13 @@ public class RadiatorService {
 
         log.info("Deleting radiator {}", id);
 
-
         logService.createLog(
                 DeviceType.RADIATOR,
                 radiator.getId(),
                 LogStatus.WARNING,
                 EventSource.USER,
                 "DELETE_RADIATOR",
-                "Radiator was deleted"
-        );
+                "Radiator was deleted");
 
         radiatorRepository.delete(radiator);
     }
@@ -106,8 +102,7 @@ public class RadiatorService {
                 radiator.getId(),
                 EventType.RADIATOR_TEMPERATURE_SET,
                 source,
-                "Radiator temperature changed from " + oldTemp + " to " + newTemp
-        );
+                "Radiator temperature changed from " + oldTemp + " to " + newTemp);
 
         logService.createLog(
                 DeviceType.RADIATOR,
@@ -115,8 +110,7 @@ public class RadiatorService {
                 LogStatus.SUCCESS,
                 source,
                 "UPDATE_TEMPERATURE",
-                "Radiator temperature changed from " + oldTemp + " to " + newTemp
-        );
+                "Radiator temperature changed from " + oldTemp + " to " + newTemp);
 
         return radiator;
     }
@@ -134,12 +128,7 @@ public class RadiatorService {
         log.info("Radiator {} marked as broken", id);
 
         deviceEventService.createEvent(
-                DeviceType.RADIATOR,
-                radiator.getId(),
-                EventType.RADIATOR_BROKEN,
-                source,
-                "Radiator marked as broken"
-        );
+                DeviceType.RADIATOR, radiator.getId(), EventType.RADIATOR_BROKEN, source, "Radiator marked as broken");
 
         logService.createLog(
                 DeviceType.RADIATOR,
@@ -147,8 +136,7 @@ public class RadiatorService {
                 LogStatus.WARNING,
                 source,
                 "MARK_AS_BROKEN",
-                "Radiator status changed to broken"
-        );
+                "Radiator status changed to broken");
 
         return radiator;
     }
@@ -166,12 +154,7 @@ public class RadiatorService {
         log.info("Radiator {} restored", id);
 
         deviceEventService.createEvent(
-                DeviceType.RADIATOR,
-                radiator.getId(),
-                EventType.RADIATOR_RESTORED,
-                source,
-                "Radiator restored"
-        );
+                DeviceType.RADIATOR, radiator.getId(), EventType.RADIATOR_RESTORED, source, "Radiator restored");
 
         logService.createLog(
                 DeviceType.RADIATOR,
@@ -179,8 +162,7 @@ public class RadiatorService {
                 LogStatus.SUCCESS,
                 source,
                 "RESTORE_RADIATOR",
-                "Radiator restored successfully"
-        );
+                "Radiator restored successfully");
 
         return radiator;
     }
@@ -202,8 +184,7 @@ public class RadiatorService {
                 radiator.getId(),
                 online ? EventType.RADIATOR_ONLINE : EventType.RADIATOR_OFFLINE,
                 source,
-                "Radiator online status changed to " + online
-        );
+                "Radiator online status changed to " + online);
 
         logService.createLog(
                 DeviceType.RADIATOR,
@@ -211,8 +192,7 @@ public class RadiatorService {
                 LogStatus.SUCCESS,
                 source,
                 "CHANGE_ONLINE_STATUS",
-                "Radiator online status updated successfully"
-        );
+                "Radiator online status updated successfully");
 
         return radiator;
     }
@@ -236,6 +216,4 @@ public class RadiatorService {
             changeOnlineStatus(id, updatedRadiator.getIsOnline(), source);
         }
     }
-
-
 }

@@ -58,8 +58,7 @@ public class BlindsController {
     }
 
     @PostMapping("/{id}")
-    public String updateBlinds(@PathVariable Long id,
-                               @ModelAttribute("blinds") Blinds blinds) {
+    public String updateBlinds(@PathVariable Long id, @ModelAttribute("blinds") Blinds blinds) {
         blindsService.updateFromForm(id, blinds, EventSource.USER);
         return "redirect:/blinds";
     }

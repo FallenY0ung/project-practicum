@@ -1,9 +1,8 @@
 package ru.tbank.practicum.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.math.BigDecimal;
+import lombok.*;
 
 @Entity
 @Table(name = "radiator_rule")

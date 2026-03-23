@@ -1,12 +1,11 @@
 package ru.tbank.practicum.entity;
 
 import jakarta.persistence.*;
+import java.time.OffsetDateTime;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import ru.tbank.practicum.enums.BlindsState;
-
-import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "blinds")

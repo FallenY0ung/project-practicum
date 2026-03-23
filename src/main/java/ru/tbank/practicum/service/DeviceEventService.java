@@ -1,6 +1,7 @@
 package ru.tbank.practicum.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,8 +10,6 @@ import ru.tbank.practicum.enums.DeviceType;
 import ru.tbank.practicum.enums.EventSource;
 import ru.tbank.practicum.enums.EventType;
 import ru.tbank.practicum.repositories.DeviceEventRepository;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -21,7 +20,8 @@ public class DeviceEventService {
 
     @Transactional(readOnly = true)
     public DeviceEvent getById(Long id) {
-        return deviceEventRepository.findById(id)
+        return deviceEventRepository
+                .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("DeviceEvent with id " + id + " not found"));
     }
 
@@ -41,12 +41,7 @@ public class DeviceEventService {
     }
 
     public DeviceEvent createEvent(
-            DeviceType deviceType,
-            Long deviceId,
-            EventType eventType,
-            EventSource source,
-            String message
-    ) {
+            DeviceType deviceType, Long deviceId, EventType eventType, EventSource source, String message) {
         validate(deviceType, deviceId, eventType, source, message);
 
         DeviceEvent deviceEvent = DeviceEvent.builder()
@@ -70,17 +65,11 @@ public class DeviceEventService {
                 deviceEvent.getDeviceId(),
                 deviceEvent.getEventType(),
                 deviceEvent.getSource(),
-                deviceEvent.getMessage()
-        );
+                deviceEvent.getMessage());
     }
 
     private void validate(
-            DeviceType deviceType,
-            Long deviceId,
-            EventType eventType,
-            EventSource source,
-            String message
-    ) {
+            DeviceType deviceType, Long deviceId, EventType eventType, EventSource source, String message) {
         if (deviceType == null) {
             throw new IllegalArgumentException("Device type cannot be null");
         }

@@ -1,14 +1,13 @@
 package ru.tbank.practicum.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tbank.practicum.entity.Weather;
 import ru.tbank.practicum.repositories.WeatherRepository;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 @Transactional
@@ -19,7 +18,8 @@ public class WeatherService {
 
     @Transactional(readOnly = true)
     public Weather getById(Long id) {
-        return weatherRepository.findById(id)
+        return weatherRepository
+                .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Weather with id " + id + " not found"));
     }
 
@@ -30,7 +30,8 @@ public class WeatherService {
 
     @Transactional(readOnly = true)
     public Weather getLatest() {
-        return weatherRepository.findTopByOrderByRecordedAtDesc()
+        return weatherRepository
+                .findTopByOrderByRecordedAtDesc()
                 .orElseThrow(() -> new EntityNotFoundException("No weather records found"));
     }
 
@@ -47,8 +48,7 @@ public class WeatherService {
             String description,
             Long pressure,
             Long humidity,
-            BigDecimal windSpeed
-    ) {
+            BigDecimal windSpeed) {
         Weather weather = getById(id);
 
         weather.setTemp(temp);
@@ -64,13 +64,13 @@ public class WeatherService {
     }
 
     private void validateWeather(Weather weather) {
-        if (weather.getTemp() == null ||
-                weather.getFeelsLike() == null ||
-                weather.getName() == null ||
-                weather.getDescription() == null ||
-                weather.getPressure() == null ||
-                weather.getHumidity() == null ||
-                weather.getWindSpeed() == null) {
+        if (weather.getTemp() == null
+                || weather.getFeelsLike() == null
+                || weather.getName() == null
+                || weather.getDescription() == null
+                || weather.getPressure() == null
+                || weather.getHumidity() == null
+                || weather.getWindSpeed() == null) {
             throw new IllegalArgumentException("Weather fields cannot be null");
         }
 

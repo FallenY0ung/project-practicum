@@ -1,5 +1,10 @@
 package ru.tbank.practicum.service;
 
+import java.math.BigDecimal;
+import java.time.LocalTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,12 +16,6 @@ import ru.tbank.practicum.entity.Schedule;
 import ru.tbank.practicum.entity.Weather;
 import ru.tbank.practicum.enums.BlindsState;
 import ru.tbank.practicum.enums.EventSource;
-
-import java.math.BigDecimal;
-import java.time.LocalTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -67,14 +66,9 @@ public class SmartHomeService {
                 rule.getId(),
                 radiatorId,
                 outsideTemp,
-                rule.getTargetRadiatorTemp()
-        );
+                rule.getTargetRadiatorTemp());
 
-        radiatorService.updateTemperature(
-                radiatorId,
-                rule.getTargetRadiatorTemp(),
-                EventSource.WEATHER_RULE
-        );
+        radiatorService.updateTemperature(radiatorId, rule.getTargetRadiatorTemp(), EventSource.WEATHER_RULE);
     }
 
     public void applyWeatherRulesToAllRadiators() {
@@ -101,8 +95,7 @@ public class SmartHomeService {
         LocalTime now = LocalTime.now();
         List<Schedule> schedules = scheduleService.getActiveByBlindsId(blindsId);
 
-        boolean shouldBeOpen = schedules.stream()
-                .anyMatch(schedule -> isInsideSchedule(now, schedule));
+        boolean shouldBeOpen = schedules.stream().anyMatch(schedule -> isInsideSchedule(now, schedule));
 
         BlindsState targetState = shouldBeOpen ? BlindsState.OPEN : BlindsState.CLOSED;
 
@@ -131,9 +124,7 @@ public class SmartHomeService {
     private Optional<RadiatorRule> findMatchingRule(BigDecimal outsideTemp, List<RadiatorRule> rules) {
         return rules.stream()
                 .filter(rule -> isInsideRange(outsideTemp, rule))
-                .min(Comparator.comparing(rule ->
-                        rule.getMaxOutsideTemp().subtract(rule.getMinOutsideTemp())
-                ));
+                .min(Comparator.comparing(rule -> rule.getMaxOutsideTemp().subtract(rule.getMinOutsideTemp())));
     }
 
     private boolean isInsideRange(BigDecimal outsideTemp, RadiatorRule rule) {

@@ -1,6 +1,7 @@
 package ru.tbank.practicum.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,9 +10,6 @@ import ru.tbank.practicum.enums.DeviceType;
 import ru.tbank.practicum.enums.EventSource;
 import ru.tbank.practicum.enums.LogStatus;
 import ru.tbank.practicum.repositories.LogRepository;
-
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -22,7 +20,8 @@ public class LogService {
 
     @Transactional(readOnly = true)
     public Log getById(Long id) {
-        return logRepository.findById(id)
+        return logRepository
+                .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Log with id " + id + " not found"));
     }
 
@@ -42,13 +41,7 @@ public class LogService {
     }
 
     public Log createLog(
-            DeviceType deviceType,
-            Long deviceId,
-            LogStatus status,
-            EventSource source,
-            String action,
-            String message
-    ) {
+            DeviceType deviceType, Long deviceId, LogStatus status, EventSource source, String action, String message) {
         validate(deviceType, deviceId, status, source, action, message);
 
         Log log = Log.builder()
@@ -74,18 +67,11 @@ public class LogService {
                 log.getStatus(),
                 log.getSource(),
                 log.getAction(),
-                log.getMessage()
-        );
+                log.getMessage());
     }
 
     private void validate(
-            DeviceType deviceType,
-            Long deviceId,
-            LogStatus status,
-            EventSource source,
-            String action,
-            String message
-    ) {
+            DeviceType deviceType, Long deviceId, LogStatus status, EventSource source, String action, String message) {
         if (deviceType == null) {
             throw new IllegalArgumentException("Device type cannot be null");
         }

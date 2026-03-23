@@ -21,14 +21,15 @@ public class RadiatorController {
     @GetMapping
     public String getRadiators(Model model) {
         model.addAttribute("radiators", radiatorService.getAll());
-        return  "radiators/index";
+        return "radiators/index";
     }
 
     @GetMapping("/new")
     public String newRadiator(Model model) {
         model.addAttribute("radiator", new Radiator());
-        return  "radiators/new";
+        return "radiators/new";
     }
+
     @PostMapping
     public String saveRadiator(@ModelAttribute("radiator") Radiator radiator) {
         radiatorService.save(radiator, EventSource.USER);
@@ -40,7 +41,7 @@ public class RadiatorController {
         model.addAttribute("radiator", radiatorService.getById(id));
         model.addAttribute("rules", radiatorRuleService.getByRadiatorId(id));
         model.addAttribute("newRule", new RadiatorRule());
-        return  "radiators/edit";
+        return "radiators/edit";
     }
 
     @PostMapping("/{radiatorId}/rules")

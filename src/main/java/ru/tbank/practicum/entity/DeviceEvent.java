@@ -1,14 +1,13 @@
 package ru.tbank.practicum.entity;
 
 import jakarta.persistence.*;
+import java.time.OffsetDateTime;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import ru.tbank.practicum.enums.DeviceType;
 import ru.tbank.practicum.enums.EventSource;
 import ru.tbank.practicum.enums.EventType;
-
-import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "device_event")

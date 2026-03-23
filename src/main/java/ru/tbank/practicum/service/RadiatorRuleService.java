@@ -1,7 +1,8 @@
 package ru.tbank.practicum.service;
 
-import com.sun.nio.sctp.IllegalReceiveException;
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,6 @@ import ru.tbank.practicum.enums.DeviceType;
 import ru.tbank.practicum.enums.EventSource;
 import ru.tbank.practicum.enums.LogStatus;
 import ru.tbank.practicum.repositories.RadiatorRuleRepository;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 @Transactional
@@ -26,7 +24,8 @@ public class RadiatorRuleService {
 
     @Transactional(readOnly = true)
     public RadiatorRule getById(Long id) {
-        return radiatorRuleRepository.findById(id)
+        return radiatorRuleRepository
+                .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("RadiatorRule with id " + id + " not found"));
     }
 
@@ -56,8 +55,7 @@ public class RadiatorRuleService {
                 LogStatus.WARNING,
                 source,
                 "DELETE_RADIATOR_RULE",
-                "Radiator rule was deleted"
-        );
+                "Radiator rule was deleted");
 
         radiatorRuleRepository.delete(radiatorRule);
     }
@@ -66,12 +64,14 @@ public class RadiatorRuleService {
         validateRule(
                 radiatorRule.getMinOutsideTemp(),
                 radiatorRule.getMaxOutsideTemp(),
-                radiatorRule.getTargetRadiatorTemp()
-        );
+                radiatorRule.getTargetRadiatorTemp());
 
         RadiatorRule saved = radiatorRuleRepository.save(radiatorRule);
 
-        log.info("RadiatorRule created: id={}, radiatorId={}", saved.getId(), saved.getRadiator().getId());
+        log.info(
+                "RadiatorRule created: id={}, radiatorId={}",
+                saved.getId(),
+                saved.getRadiator().getId());
 
         logService.createLog(
                 DeviceType.RADIATOR,
@@ -79,13 +79,13 @@ public class RadiatorRuleService {
                 LogStatus.SUCCESS,
                 EventSource.SYSTEM,
                 "CREATE_RADIATOR_RULE",
-                "Radiator rule was created successfully"
-        );
+                "Radiator rule was created successfully");
 
         return saved;
     }
 
-    public RadiatorRule updateRadiatorRule(Long id, BigDecimal min, BigDecimal max, BigDecimal target, Boolean enabled) {
+    public RadiatorRule updateRadiatorRule(
+            Long id, BigDecimal min, BigDecimal max, BigDecimal target, Boolean enabled) {
         validateRule(min, max, target);
 
         RadiatorRule radiatorRule = getById(id);
@@ -103,8 +103,7 @@ public class RadiatorRuleService {
                 LogStatus.SUCCESS,
                 EventSource.SYSTEM,
                 "UPDATE_RADIATOR_RULE",
-                "Radiator rule was updated successfully"
-        );
+                "Radiator rule was updated successfully");
 
         return radiatorRule;
     }
@@ -119,4 +118,3 @@ public class RadiatorRuleService {
         }
     }
 }
-

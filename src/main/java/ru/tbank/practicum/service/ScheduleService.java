@@ -1,19 +1,17 @@
 package ru.tbank.practicum.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.time.LocalTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.tbank.practicum.entity.RadiatorRule;
 import ru.tbank.practicum.entity.Schedule;
 import ru.tbank.practicum.enums.DeviceType;
 import ru.tbank.practicum.enums.EventSource;
 import ru.tbank.practicum.enums.LogStatus;
 import ru.tbank.practicum.repositories.ScheduleRepository;
-
-import java.time.LocalTime;
-import java.util.List;
 
 @Service
 @Transactional
@@ -26,7 +24,8 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public Schedule getById(Long id) {
-        return scheduleRepository.findById(id)
+        return scheduleRepository
+                .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Schedule with id " + id + " not found"));
     }
 
@@ -41,7 +40,7 @@ public class ScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public List<Schedule> getByBlindsId(Long blindsId){
+    public List<Schedule> getByBlindsId(Long blindsId) {
         return scheduleRepository.findByBlindsId(blindsId);
     }
 
@@ -50,16 +49,13 @@ public class ScheduleService {
 
         log.info("Deleting radiator rule {}", id);
 
-
-
         logService.createLog(
                 DeviceType.RADIATOR,
                 schedule.getId(),
                 LogStatus.WARNING,
                 source,
                 "DELETE_RADIATOR_RULE",
-                "Radiator rule was deleted"
-        );
+                "Radiator rule was deleted");
 
         scheduleRepository.delete(schedule);
     }
@@ -69,7 +65,10 @@ public class ScheduleService {
 
         Schedule saved = scheduleRepository.save(schedule);
 
-        log.info("Schedule created: id={}, blindsId={}", saved.getId(), saved.getBlinds().getId());
+        log.info(
+                "Schedule created: id={}, blindsId={}",
+                saved.getId(),
+                saved.getBlinds().getId());
 
         logService.createLog(
                 DeviceType.BLINDS,
@@ -77,8 +76,7 @@ public class ScheduleService {
                 LogStatus.SUCCESS,
                 EventSource.SYSTEM,
                 "CREATE_SCHEDULE",
-                "Schedule was created successfully"
-        );
+                "Schedule was created successfully");
 
         return saved;
     }
@@ -99,8 +97,7 @@ public class ScheduleService {
                 LogStatus.SUCCESS,
                 EventSource.SYSTEM,
                 "UPDATE_SCHEDULE",
-                "Schedule was updated successfully"
-        );
+                "Schedule was updated successfully");
 
         return schedule;
     }

@@ -1,7 +1,7 @@
 package ru.tbank.practicum.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,8 +11,6 @@ import ru.tbank.practicum.entity.Schedule;
 import ru.tbank.practicum.enums.*;
 import ru.tbank.practicum.repositories.BlindsRepository;
 import ru.tbank.practicum.repositories.ScheduleRepository;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -27,7 +25,8 @@ public class BlindsService {
 
     @Transactional(readOnly = true)
     public Blinds getById(Long id) {
-        return blindsRepository.findById(id)
+        return blindsRepository
+                .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Blinds with id " + id + " not found"));
     }
 
@@ -37,7 +36,7 @@ public class BlindsService {
     }
 
     @Transactional(readOnly = true)
-    public List<Schedule> getByBlindsId(Long blindsId){
+    public List<Schedule> getByBlindsId(Long blindsId) {
         return scheduleRepository.findByBlindsId(blindsId);
     }
 
@@ -52,8 +51,7 @@ public class BlindsService {
                 LogStatus.SUCCESS,
                 EventSource.SYSTEM,
                 "CREATE_BLINDS",
-                "Blinds were created successfully"
-        );
+                "Blinds were created successfully");
 
         return saved;
     }
@@ -73,8 +71,7 @@ public class BlindsService {
                 LogStatus.WARNING,
                 EventSource.USER,
                 "DELETE_BLINDS",
-                "Blinds were deleted"
-        );
+                "Blinds were deleted");
 
         blindsRepository.delete(blinds);
     }
@@ -97,8 +94,7 @@ public class BlindsService {
                 blinds.getId(),
                 mapStateToEventType(newState),
                 source,
-                "Blinds state changed from " + oldState + " to " + newState
-        );
+                "Blinds state changed from " + oldState + " to " + newState);
 
         logService.createLog(
                 DeviceType.BLINDS,
@@ -106,8 +102,7 @@ public class BlindsService {
                 LogStatus.SUCCESS,
                 source,
                 "UPDATE_BLINDS_STATE",
-                "Blinds state changed from " + oldState + " to " + newState
-        );
+                "Blinds state changed from " + oldState + " to " + newState);
 
         return blinds;
     }
@@ -129,8 +124,7 @@ public class BlindsService {
                 blinds.getId(),
                 online ? EventType.BLINDS_ONLINE : EventType.BLINDS_OFFLINE,
                 source,
-                "Blinds online status changed to " + online
-        );
+                "Blinds online status changed to " + online);
 
         logService.createLog(
                 DeviceType.BLINDS,
@@ -138,8 +132,7 @@ public class BlindsService {
                 LogStatus.SUCCESS,
                 source,
                 "CHANGE_BLINDS_ONLINE_STATUS",
-                "Blinds online status changed to " + online
-        );
+                "Blinds online status changed to " + online);
 
         return blinds;
     }
@@ -157,12 +150,7 @@ public class BlindsService {
         log.info("Blinds {} marked as broken", id);
 
         deviceEventService.createEvent(
-                DeviceType.BLINDS,
-                blinds.getId(),
-                EventType.BLINDS_BROKEN,
-                source,
-                "Blinds marked as broken"
-        );
+                DeviceType.BLINDS, blinds.getId(), EventType.BLINDS_BROKEN, source, "Blinds marked as broken");
 
         logService.createLog(
                 DeviceType.BLINDS,
@@ -170,8 +158,7 @@ public class BlindsService {
                 LogStatus.WARNING,
                 source,
                 "MARK_BLINDS_BROKEN",
-                "Blinds marked as broken"
-        );
+                "Blinds marked as broken");
 
         return blinds;
     }
@@ -189,12 +176,7 @@ public class BlindsService {
         log.info("Blinds {} restored", id);
 
         deviceEventService.createEvent(
-                DeviceType.BLINDS,
-                blinds.getId(),
-                EventType.BLINDS_RESTORED,
-                source,
-                "Blinds restored"
-        );
+                DeviceType.BLINDS, blinds.getId(), EventType.BLINDS_RESTORED, source, "Blinds restored");
 
         logService.createLog(
                 DeviceType.BLINDS,
@@ -202,8 +184,7 @@ public class BlindsService {
                 LogStatus.SUCCESS,
                 source,
                 "RESTORE_BLINDS",
-                "Blinds restored successfully"
-        );
+                "Blinds restored successfully");
 
         return blinds;
     }
