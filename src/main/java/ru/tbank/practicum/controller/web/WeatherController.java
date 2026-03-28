@@ -1,6 +1,7 @@
 package ru.tbank.practicum.controller.web;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import ru.tbank.practicum.entity.Weather;
 import ru.tbank.practicum.service.WeatherService;
 import ru.tbank.practicum.service.WeatherSyncService;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/weather")
@@ -25,7 +27,8 @@ public class WeatherController {
         Weather latestWeather = null;
         try {
             latestWeather = weatherService.getLatest();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.warn("Failed to load latest weather", e);
         }
 
         model.addAttribute("latestWeather", latestWeather);

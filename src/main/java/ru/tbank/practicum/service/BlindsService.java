@@ -110,7 +110,7 @@ public class BlindsService {
     public Blinds changeOnlineStatus(Long id, boolean online, EventSource source) {
         Blinds blinds = getById(id);
 
-        if (Boolean.valueOf(online).equals(blinds.getIsOnline())) {
+        if (blinds.getIsOnline() == online) {
             log.info("Blinds {} online status is already {}", id, online);
             return blinds;
         }

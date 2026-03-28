@@ -36,7 +36,6 @@ public class WeatherService {
     }
 
     public Weather save(Weather weather) {
-        validateWeather(weather);
         return weatherRepository.save(weather);
     }
 
@@ -59,39 +58,6 @@ public class WeatherService {
         weather.setHumidity(humidity);
         weather.setWindSpeed(windSpeed);
 
-        validateWeather(weather);
         return weather;
-    }
-
-    private void validateWeather(Weather weather) {
-        if (weather.getTemp() == null
-                || weather.getFeelsLike() == null
-                || weather.getName() == null
-                || weather.getDescription() == null
-                || weather.getPressure() == null
-                || weather.getHumidity() == null
-                || weather.getWindSpeed() == null) {
-            throw new IllegalArgumentException("Weather fields cannot be null");
-        }
-
-        if (weather.getHumidity() < 0 || weather.getHumidity() > 100) {
-            throw new IllegalArgumentException("Humidity must be between 0 and 100");
-        }
-
-        if (weather.getPressure() < 0) {
-            throw new IllegalArgumentException("Pressure cannot be negative");
-        }
-
-        if (weather.getWindSpeed().compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Wind speed cannot be negative");
-        }
-
-        if (weather.getName().isBlank()) {
-            throw new IllegalArgumentException("Weather name cannot be blank");
-        }
-
-        if (weather.getDescription().isBlank()) {
-            throw new IllegalArgumentException("Weather description cannot be blank");
-        }
     }
 }
