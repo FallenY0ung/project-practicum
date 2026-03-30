@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Редактирование радиатора</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Smart Home</p>
+      <h1>Редактирование радиатора</h1>
+      <p class="subtitle">
+        Настройка устройства
+        <span th:text="'#' + ${radiator.id}">#1</span>
+      </p>
+    </div>
+
+    <a class="btn btn-secondary" th:href="@{/radiators}">← Назад к списку</a>
+  </header>
+
+  <section class="card form-card">
+    <div class="card-header">
+      <h2 th:text="'Радиатор #' + ${radiator.id}">Радиатор</h2>
+    </div>
+
+    <form th:action="@{/radiators/{id}(id=${radiator.id})}"
+          th:object="${radiator}"
+          method="post"
+          class="form-grid">
+
+      <input type="hidden" th:field="*{id}">
+
+      <div class="form-group">
+        <label for="temp">Температура</label>
+        <input id="temp"
+               type="number"
+               step="0.01"
+               min="0"
+               th:field="*{temp}"
+               required>
+      </div>
+
+      <div class="form-group">
+        <label for="updatedAt">Последнее обновление</label>
+        <input id="updatedAt"
+               type="text"
+               th:value="${#temporals.format(radiator.updatedAt, 'dd.MM.yyyy HH:mm')}"
+               readonly>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" th:field="*{isOnline}">
+          <span>Устройство онлайн</span>
+        </label>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" th:field="*{isBroken}">
+          <span>Устройство сломано</span>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <a class="btn btn-secondary" th:href="@{/radiators}">Отмена</a>
+        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card section-spacing">
+    <div class="card-header">
+      <h2>Правила радиатора</h2>
+      <span class="badge" th:text="${#lists.size(rules)} + ' шт.'">0 шт.</span>
+    </div>
+
+    <div th:if="${#lists.isEmpty(rules)}" class="empty-state compact-empty">
+      <p>Для этого радиатора пока нет правил.</p>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(rules)}" class="table-wrapper">
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Мин. наружная</th>
+          <th>Макс. наружная</th>
+          <th>Целевая температура</th>
+          <th>Активно</th>
+          <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="rule : ${rules}">
+          <td th:text="${rule.id}">1</td>
+          <td th:text="${rule.minOutsideTemp}">-5.00</td>
+          <td th:text="${rule.maxOutsideTemp}">5.00</td>
+          <td th:text="${rule.targetRadiatorTemp}">24.00</td>
+          <td>
+            <span class="status-pill status-success" th:if="${rule.enabled}">Да</span>
+            <span class="status-pill status-muted" th:unless="${rule.enabled}">Нет</span>
+          </td>
+          <td>
+            <div class="actions">
+              <form th:action="@{/radiators/{radiatorId}/rules/{ruleId}/delete(radiatorId=${radiator.id}, ruleId=${rule.id})}"
+                    method="post"
+                    onsubmit="return confirm('Удалить это правило?');">
+                <button type="submit" class="btn btn-danger">Удалить</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card section-spacing form-card">
+    <div class="card-header">
+      <h2>Добавить правило</h2>
+    </div>
+
+    <form th:action="@{/radiators/{radiatorId}/rules(radiatorId=${radiator.id})}"
+          th:object="${newRule}"
+          method="post"
+          class="form-grid">
+
+      <div class="form-group">
+        <label for="minOutsideTemp">Мин. наружная температура</label>
+        <input id="minOutsideTemp"
+               type="number"
+               step="0.01"
+               th:field="*{minOutsideTemp}"
+               required>
+      </div>
+
+      <div class="form-group">
+        <label for="maxOutsideTemp">Макс. наружная температура</label>
+        <input id="maxOutsideTemp"
+               type="number"
+               step="0.01"
+               th:field="*{maxOutsideTemp}"
+               required>
+      </div>
+
+      <div class="form-group">
+        <label for="targetRadiatorTemp">Целевая температура радиатора</label>
+        <input id="targetRadiatorTemp"
+               type="number"
+               step="0.01"
+               min="0"
+               th:field="*{targetRadiatorTemp}"
+               required>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" th:field="*{enabled}">
+          <span>Активное правило</span>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Добавить правило</button>
+      </div>
+    </form>
+  </section>
+</div>
+</body>
+</html>

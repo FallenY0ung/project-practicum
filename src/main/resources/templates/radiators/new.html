@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Новый радиатор</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Smart Home</p>
+      <h1>Создание радиатора</h1>
+      <p class="subtitle">Добавьте новое устройство в систему</p>
+    </div>
+
+    <a class="btn btn-secondary" th:href="@{/radiators}">← Назад к списку</a>
+  </header>
+
+  <section class="card form-card">
+    <div class="card-header">
+      <h2>Новый радиатор</h2>
+    </div>
+
+    <form th:action="@{/radiators}" th:object="${radiator}" method="post" class="form-grid">
+      <div class="form-group">
+        <label for="temp">Температура</label>
+        <input id="temp"
+               type="number"
+               step="0.01"
+               min="0"
+               placeholder="Например, 22.50"
+               th:field="*{temp}"
+               required>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" th:field="*{isOnline}">
+          <span>Устройство онлайн</span>
+        </label>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" th:field="*{isBroken}">
+          <span>Устройство сломано</span>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <a class="btn btn-secondary" th:href="@{/radiators}">Отмена</a>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+      </div>
+    </form>
+  </section>
+</div>
+</body>
+</html>

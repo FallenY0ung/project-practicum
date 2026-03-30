@@ -1,0 +1,457 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-radiator
+      author: FallenY0ung
+      changes:
+        - createTable:
+            tableName: radiator
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: temp
+                  type: DECIMAL(5,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_online
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_broken
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 002-create-radiator-rule
+      author: FallenY0ung
+      changes:
+        - createTable:
+            tableName: radiator_rule
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: radiator_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: min_outside_temp
+                  type: DECIMAL(5,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: max_outside_temp
+                  type: DECIMAL(5,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: target_radiator_temp
+                  type: DECIMAL(5,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: radiator_rule
+            baseColumnNames: radiator_id
+            referencedTableName: radiator
+            referencedColumnNames: id
+            constraintName: fk_radiator_rule_radiator
+
+        - createIndex:
+            tableName: radiator_rule
+            indexName: idx_radiator_rule_radiator_id
+            columns:
+              - column:
+                  name: radiator_id
+
+  - changeSet:
+      id: 003-create-blinds-state-enum
+      author: FallenY0ung
+      changes:
+        - sql:
+            sql: CREATE TYPE blinds_state AS ENUM ('OPEN', 'CLOSED', 'HALF_OPEN')
+
+  - changeSet:
+      id: 004-create-blinds
+      author: FallenY0ung
+      changes:
+        - createTable:
+            tableName: blinds
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: state
+                  type: blinds_state
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: is_online
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: is_broken
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 005-create-weather
+      author: FallenY0ung
+      changes:
+        - createTable:
+            tableName: weather
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: temp
+                  type: DECIMAL(5,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: feels_like
+                  type: DECIMAL(5,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: pressure
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: humidity
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: wind_speed
+                  type: DECIMAL(5,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: recorded_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - createIndex:
+            tableName: weather
+            indexName: idx_weather_recorded_at
+            columns:
+              - column:
+                  name: recorded_at
+
+  - changeSet:
+      id: 006-create-schedule
+      author: FallenY0ung
+      changes:
+        - createTable:
+            tableName: schedule
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: blinds_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: open_at
+                  type: TIME
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: close_at
+                  type: TIME
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: schedule
+            baseColumnNames: blinds_id
+            referencedTableName: blinds
+            referencedColumnNames: id
+            constraintName: fk_schedule_blinds
+
+        - createIndex:
+            tableName: schedule
+            indexName: idx_schedule_blinds_id
+            columns:
+              - column:
+                  name: blinds_id
+
+  - changeSet:
+      id: 007-create-device-type-enum
+      author: FallenY0ung
+      changes:
+        - sql:
+            sql: CREATE TYPE device_type AS ENUM ('RADIATOR', 'BLINDS')
+
+  - changeSet:
+      id: 008-create-event-type-enum
+      author: FallenY0ung
+      changes:
+        - sql:
+            sql: CREATE TYPE event_type AS ENUM (
+              'RADIATOR_TEMPERATURE_SET',
+              'RADIATOR_ONLINE',
+              'RADIATOR_OFFLINE',
+              'RADIATOR_BROKEN',
+              'RADIATOR_RESTORED',
+              'BLINDS_OPENED',
+              'BLINDS_CLOSED',
+              'BLINDS_HALF_OPENED',
+              'BLINDS_ONLINE',
+              'BLINDS_OFFLINE',
+              'BLINDS_BROKEN',
+              'BLINDS_RESTORED',
+              'RULE_APPLIED',
+              'SCHEDULE_APPLIED'
+              )
+
+  - changeSet:
+      id: 009-create-event-source-enum
+      author: FallenY0ung
+      changes:
+        - sql:
+            sql: CREATE TYPE event_source AS ENUM ('SYSTEM', 'USER', 'SCHEDULE', 'WEATHER_RULE')
+
+  - changeSet:
+      id: 010-create-device-event
+      author: FallenY0ung
+      changes:
+        - createTable:
+            tableName: device_event
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: device_type
+                  type: device_type
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: device_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: event_type
+                  type: event_type
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: source
+                  type: event_source
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: message
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - createIndex:
+            tableName: device_event
+            indexName: idx_device_event_device_type_device_id
+            columns:
+              - column:
+                  name: device_type
+              - column:
+                  name: device_id
+
+        - createIndex:
+            tableName: device_event
+            indexName: idx_device_event_created_at
+            columns:
+              - column:
+                  name: created_at
+
+  - changeSet:
+      id: 011-create-log-status-enum
+      author: FallenY0ung
+      changes:
+        - sql:
+            sql: CREATE TYPE log_status AS ENUM ('SUCCESS', 'FAILED', 'WARNING')
+
+  - changeSet:
+      id: 012-create-log
+      author: FallenY0ung
+      changes:
+        - createTable:
+            tableName: log
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: device_type
+                  type: device_type
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: device_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: log_status
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: source
+                  type: event_source
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: action
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: message
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - createIndex:
+            tableName: log
+            indexName: idx_log_device_type_device_id
+            columns:
+              - column:
+                  name: device_type
+              - column:
+                  name: device_id
+
+        - createIndex:
+            tableName: log
+            indexName: idx_log_created_at
+            columns:
+              - column:
+                  name: created_at

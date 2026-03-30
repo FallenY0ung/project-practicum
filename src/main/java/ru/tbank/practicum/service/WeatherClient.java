@@ -22,7 +22,7 @@ public class WeatherClient {
 
     private final RestClient restClient;
     private final WeatherProperties props;
-    public static final ParameterizedTypeReference<List<GeocodingLocation>> geocodinListType =
+    public static final ParameterizedTypeReference<List<GeocodingLocation>> geocodingListType =
             new ParameterizedTypeReference<>() {};
 
     @Retryable(includes = WeatherRateLimitException.class, maxRetries = 10, delay = 1000)
@@ -83,7 +83,7 @@ public class WeatherClient {
                     throw new RuntimeException(
                             "Geocoding API is unavailable: " + res.getStatusCode() + ", body=" + errorBody);
                 })
-                .body(geocodinListType);
+                .body(geocodingListType);
 
         if (locations == null || locations.isEmpty()) {
             throw new RuntimeException("City not found: " + city);

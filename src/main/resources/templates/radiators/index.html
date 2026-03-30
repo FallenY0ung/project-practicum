@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Radiators</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="page">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Smart Home</p>
+            <h1>Радиаторы</h1>
+            <p class="subtitle">Управление радиаторами в системе умного дома</p>
+        </div>
+
+        <a class="btn btn-primary" th:href="@{/radiators/new}">+ Добавить радиатор</a>
+    </header>
+
+    <section class="card">
+        <div class="card-header">
+            <h2>Список радиаторов</h2>
+            <span class="badge" th:text="${#lists.size(radiators)} + ' шт.'">0 шт.</span>
+        </div>
+
+        <div th:if="${#lists.isEmpty(radiators)}" class="empty-state">
+            <p>Радиаторы пока не добавлены.</p>
+            <a class="btn btn-primary" th:href="@{/radiators/new}">Создать первый радиатор</a>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(radiators)}" class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Температура</th>
+                    <th>Онлайн</th>
+                    <th>Сломан</th>
+                    <th>Обновлен</th>
+                    <th>Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="radiator : ${radiators}">
+                    <td th:text="${radiator.id}">1</td>
+                    <td th:text="${radiator.temp}">22.50</td>
+
+                    <td>
+                        <span class="status-pill status-success"
+                              th:if="${radiator.isOnline}">Да</span>
+                        <span class="status-pill status-muted"
+                              th:unless="${radiator.isOnline}">Нет</span>
+                    </td>
+
+                    <td>
+                        <span class="status-pill status-danger"
+                              th:if="${radiator.isBroken}">Да</span>
+                        <span class="status-pill status-success"
+                              th:unless="${radiator.isBroken}">Нет</span>
+                    </td>
+
+                    <td th:text="${#temporals.format(radiator.updatedAt, 'dd.MM.yyyy HH:mm')}">-</td>
+
+                    <td>
+                        <div class="actions">
+                            <a class="btn btn-secondary"
+                               th:href="@{/radiators/{id}/edit(id=${radiator.id})}">
+                                Редактировать
+                            </a>
+
+                            <form th:action="@{/radiators/{id}/delete(id=${radiator.id})}" method="post"
+                                  onsubmit="return confirm('Удалить радиатор?');">
+                                <button type="submit" class="btn btn-danger">Удалить</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+</body>
+</html>
