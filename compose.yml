@@ -3,18 +3,35 @@ services:
     image: postgres:18
     container_name: homeapp-db
     environment:
-      POSTGRES_DB: homeapp
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d homeapp"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10
+
+  migrations:
+    image: liquibase/liquibase:4.33
+    container_name: homeapp-migrations
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./src/main/resources/db/changelog:/liquibase/changelog
+    environment:
+      LIQUIBASE_COMMAND_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      LIQUIBASE_COMMAND_USERNAME: ${POSTGRES_USER}
+      LIQUIBASE_COMMAND_PASSWORD: ${POSTGRES_PASSWORD}
+    command:
+      - --search-path=/liquibase/changelog
+      - --changelog-file=db.changelog-master.yaml
+      - update
 
   app:
     build:
@@ -24,10 +41,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
     environment:
-      DB_URL: jdbc:postgresql://db:5432/homeapp
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SPRING_LIQUIBASE_ENABLED: "false"
     ports:
       - "8080:8080"
     restart: unless-stopped
