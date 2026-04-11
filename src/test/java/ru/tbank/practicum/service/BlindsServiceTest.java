@@ -1,5 +1,14 @@
 package ru.tbank.practicum.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,18 +26,6 @@ import ru.tbank.practicum.enums.EventType;
 import ru.tbank.practicum.enums.LogStatus;
 import ru.tbank.practicum.repositories.BlindsRepository;
 import ru.tbank.practicum.repositories.ScheduleRepository;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class BlindsServiceTest {
@@ -85,7 +82,6 @@ public class BlindsServiceTest {
 
         assertEquals(blinds, result);
         verify(blindsRepository).findById(1L);
-
     }
 
     @DisplayName("Должен сохранить Blinds и создать Log через LogService")
@@ -103,19 +99,19 @@ public class BlindsServiceTest {
         assertEquals(saved, result);
 
         verify(blindsRepository).save(blinds);
-        verify(logService).createLog(
-                DeviceType.BLINDS,
-                1L,
-                LogStatus.SUCCESS,
-                EventSource.SYSTEM,
-                "CREATE_BLINDS",
-                "Blinds were created successfully"
-        );
+        verify(logService)
+                .createLog(
+                        DeviceType.BLINDS,
+                        1L,
+                        LogStatus.SUCCESS,
+                        EventSource.SYSTEM,
+                        "CREATE_BLINDS",
+                        "Blinds were created successfully");
     }
 
     @DisplayName("Должен удалить и создать Log")
     @Test
-    public void shouldDeleteById(){
+    public void shouldDeleteById() {
         Blinds blinds = new Blinds();
         blinds.setId(1L);
 
@@ -125,19 +121,19 @@ public class BlindsServiceTest {
         blindsService.deleteById(1L);
 
         verify(blindsRepository).delete(blinds);
-        verify(logService).createLog(
-                DeviceType.BLINDS,
-                blinds.getId(),
-                LogStatus.WARNING,
-                EventSource.USER,
-                "DELETE_BLINDS",
-                "Blinds were deleted"
-        );
+        verify(logService)
+                .createLog(
+                        DeviceType.BLINDS,
+                        blinds.getId(),
+                        LogStatus.WARNING,
+                        EventSource.USER,
+                        "DELETE_BLINDS",
+                        "Blinds were deleted");
     }
 
     @DisplayName("Должен обновить и создать Log и Event")
     @Test
-    public void shouldUpdateState(){
+    public void shouldUpdateState() {
         Blinds blinds = new Blinds();
         blinds.setId(1L);
         blinds.setState(BlindsState.OPEN);
@@ -152,27 +148,27 @@ public class BlindsServiceTest {
         assertEquals(newState, result.getState());
         verify(blindsRepository).findById(1L);
 
-        verify(deviceEventService).createEvent(
-                eq(DeviceType.BLINDS),
-                eq(blinds.getId()),
-                any(),
-                eq(source),
-                eq("Blinds state changed from " + oldState + " to " + newState)
-        );
+        verify(deviceEventService)
+                .createEvent(
+                        eq(DeviceType.BLINDS),
+                        eq(blinds.getId()),
+                        any(),
+                        eq(source),
+                        eq("Blinds state changed from " + oldState + " to " + newState));
 
-        verify(logService).createLog(
-                DeviceType.BLINDS,
-                blinds.getId(),
-                LogStatus.SUCCESS,
-                source,
-                "UPDATE_BLINDS_STATE",
-                "Blinds state changed from " + oldState + " to " + newState
-        );
+        verify(logService)
+                .createLog(
+                        DeviceType.BLINDS,
+                        blinds.getId(),
+                        LogStatus.SUCCESS,
+                        source,
+                        "UPDATE_BLINDS_STATE",
+                        "Blinds state changed from " + oldState + " to " + newState);
     }
 
     @DisplayName("Должен сменить статус online")
     @Test
-    public void shouldChangeOnlineStatus(){
+    public void shouldChangeOnlineStatus() {
         Blinds blinds = new Blinds();
         blinds.setId(1L);
         blinds.setIsOnline(false);
@@ -186,27 +182,27 @@ public class BlindsServiceTest {
         assertEquals(online, result.getIsOnline());
         verify(blindsRepository).findById(1L);
 
-        verify(deviceEventService).createEvent(
-                DeviceType.BLINDS,
-                blinds.getId(),
-                online ? EventType.BLINDS_ONLINE : EventType.BLINDS_OFFLINE,
-                source,
-                "Blinds online status changed to " + online
-        );
+        verify(deviceEventService)
+                .createEvent(
+                        DeviceType.BLINDS,
+                        blinds.getId(),
+                        online ? EventType.BLINDS_ONLINE : EventType.BLINDS_OFFLINE,
+                        source,
+                        "Blinds online status changed to " + online);
 
-        verify(logService).createLog(
-                DeviceType.BLINDS,
-                blinds.getId(),
-                LogStatus.SUCCESS,
-                source,
-                "CHANGE_BLINDS_ONLINE_STATUS",
-                "Blinds online status changed to " + online
-        );
+        verify(logService)
+                .createLog(
+                        DeviceType.BLINDS,
+                        blinds.getId(),
+                        LogStatus.SUCCESS,
+                        source,
+                        "CHANGE_BLINDS_ONLINE_STATUS",
+                        "Blinds online status changed to " + online);
     }
 
     @DisplayName("Должен отметить как сломанный")
     @Test
-    public void shouldMarkAsBroken(){
+    public void shouldMarkAsBroken() {
         Blinds blinds = new Blinds();
         blinds.setId(1L);
         blinds.setIsBroken(false);
@@ -219,27 +215,23 @@ public class BlindsServiceTest {
         assertEquals(result.getIsBroken(), true);
         verify(blindsRepository).findById(1L);
 
-        verify(deviceEventService).createEvent(
-                DeviceType.BLINDS,
-                blinds.getId(),
-                EventType.BLINDS_BROKEN,
-                source,
-                "Blinds marked as broken"
-        );
+        verify(deviceEventService)
+                .createEvent(
+                        DeviceType.BLINDS, blinds.getId(), EventType.BLINDS_BROKEN, source, "Blinds marked as broken");
 
-        verify(logService).createLog(
-                DeviceType.BLINDS,
-                blinds.getId(),
-                LogStatus.WARNING,
-                source,
-                "MARK_BLINDS_BROKEN",
-                "Blinds marked as broken"
-        );
+        verify(logService)
+                .createLog(
+                        DeviceType.BLINDS,
+                        blinds.getId(),
+                        LogStatus.WARNING,
+                        source,
+                        "MARK_BLINDS_BROKEN",
+                        "Blinds marked as broken");
     }
 
     @DisplayName("Должен отметить как НЕсломанный")
     @Test
-    public void shouldRestore(){
+    public void shouldRestore() {
         Blinds blinds = new Blinds();
         blinds.setId(1L);
         blinds.setIsBroken(true);
@@ -252,47 +244,24 @@ public class BlindsServiceTest {
         assertEquals(result.getIsBroken(), false);
         verify(blindsRepository).findById(1L);
 
-        verify(deviceEventService).createEvent(
-                DeviceType.BLINDS,
-                blinds.getId(),
-                EventType.BLINDS_RESTORED,
-                source,
-                "Blinds restored"
-        );
+        verify(deviceEventService)
+                .createEvent(DeviceType.BLINDS, blinds.getId(), EventType.BLINDS_RESTORED, source, "Blinds restored");
 
-        verify(logService).createLog(
-                DeviceType.BLINDS,
-                blinds.getId(),
-                LogStatus.SUCCESS,
-                source,
-                "RESTORE_BLINDS",
-                "Blinds restored successfully"
-        );
+        verify(logService)
+                .createLog(
+                        DeviceType.BLINDS,
+                        blinds.getId(),
+                        LogStatus.SUCCESS,
+                        source,
+                        "RESTORE_BLINDS",
+                        "Blinds restored successfully");
     }
 
     @DisplayName("Должен преобразовывать BlindsState to EventType")
     @ParameterizedTest
-    @CsvSource({
-            "OPEN, BLINDS_OPENED",
-            "CLOSED, BLINDS_CLOSED",
-            "HALF_OPEN, BLINDS_HALF_OPENED"
-    })
-    public void shouldMapStateToEventType(BlindsState state, EventType expected){
+    @CsvSource({"OPEN, BLINDS_OPENED", "CLOSED, BLINDS_CLOSED", "HALF_OPEN, BLINDS_HALF_OPENED"})
+    public void shouldMapStateToEventType(BlindsState state, EventType expected) {
         EventType actual = blindsService.mapStateToEventType(state);
         assertEquals(expected, actual);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

@@ -1,5 +1,11 @@
 package ru.tbank.practicum.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,13 +20,6 @@ import ru.tbank.practicum.enums.EventType;
 import ru.tbank.practicum.enums.LogStatus;
 import ru.tbank.practicum.repositories.RadiatorRepository;
 import ru.tbank.practicum.repositories.RadiatorRuleRepository;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RadiatorServiceTest {
@@ -107,14 +106,14 @@ class RadiatorServiceTest {
         assertEquals(1L, result.getId());
 
         verify(radiatorRepository).save(radiator);
-        verify(logService).createLog(
-                DeviceType.RADIATOR,
-                1L,
-                LogStatus.SUCCESS,
-                EventSource.USER,
-                "CREATE_RADIATOR",
-                "Radiator was created successfully"
-        );
+        verify(logService)
+                .createLog(
+                        DeviceType.RADIATOR,
+                        1L,
+                        LogStatus.SUCCESS,
+                        EventSource.USER,
+                        "CREATE_RADIATOR",
+                        "Radiator was created successfully");
     }
 
     @DisplayName("Должен удалить radiator и создать лог")
@@ -130,14 +129,14 @@ class RadiatorServiceTest {
 
         verify(radiatorRepository).findById(id);
         verify(radiatorRuleRepository).findByRadiatorIdAndEnabledTrue(id);
-        verify(logService).createLog(
-                DeviceType.RADIATOR,
-                id,
-                LogStatus.WARNING,
-                EventSource.USER,
-                "DELETE_RADIATOR",
-                "Radiator was deleted"
-        );
+        verify(logService)
+                .createLog(
+                        DeviceType.RADIATOR,
+                        id,
+                        LogStatus.WARNING,
+                        EventSource.USER,
+                        "DELETE_RADIATOR",
+                        "Radiator was deleted");
         verify(radiatorRepository).delete(radiator);
     }
 
@@ -156,21 +155,21 @@ class RadiatorServiceTest {
         assertEquals(newTemp, result.getTemp());
 
         verify(radiatorRepository).findById(id);
-        verify(deviceEventService).createEvent(
-                DeviceType.RADIATOR,
-                id,
-                EventType.RADIATOR_TEMPERATURE_SET,
-                EventSource.USER,
-                "Radiator temperature changed from 22.5 to 25.0"
-        );
-        verify(logService).createLog(
-                DeviceType.RADIATOR,
-                id,
-                LogStatus.SUCCESS,
-                EventSource.USER,
-                "UPDATE_TEMPERATURE",
-                "Radiator temperature changed from 22.5 to 25.0"
-        );
+        verify(deviceEventService)
+                .createEvent(
+                        DeviceType.RADIATOR,
+                        id,
+                        EventType.RADIATOR_TEMPERATURE_SET,
+                        EventSource.USER,
+                        "Radiator temperature changed from 22.5 to 25.0");
+        verify(logService)
+                .createLog(
+                        DeviceType.RADIATOR,
+                        id,
+                        LogStatus.SUCCESS,
+                        EventSource.USER,
+                        "UPDATE_TEMPERATURE",
+                        "Radiator temperature changed from 22.5 to 25.0");
     }
 
     @DisplayName("Должен пометить radiator как сломанный, создать event и log")
@@ -187,21 +186,21 @@ class RadiatorServiceTest {
         assertTrue(result.getIsBroken());
 
         verify(radiatorRepository).findById(id);
-        verify(deviceEventService).createEvent(
-                DeviceType.RADIATOR,
-                id,
-                EventType.RADIATOR_BROKEN,
-                EventSource.USER,
-                "Radiator marked as broken"
-        );
-        verify(logService).createLog(
-                DeviceType.RADIATOR,
-                id,
-                LogStatus.WARNING,
-                EventSource.USER,
-                "MARK_AS_BROKEN",
-                "Radiator status changed to broken"
-        );
+        verify(deviceEventService)
+                .createEvent(
+                        DeviceType.RADIATOR,
+                        id,
+                        EventType.RADIATOR_BROKEN,
+                        EventSource.USER,
+                        "Radiator marked as broken");
+        verify(logService)
+                .createLog(
+                        DeviceType.RADIATOR,
+                        id,
+                        LogStatus.WARNING,
+                        EventSource.USER,
+                        "MARK_AS_BROKEN",
+                        "Radiator status changed to broken");
     }
 
     @DisplayName("Должен восстановить radiator, создать event и log")
@@ -218,21 +217,17 @@ class RadiatorServiceTest {
         assertFalse(result.getIsBroken());
 
         verify(radiatorRepository).findById(id);
-        verify(deviceEventService).createEvent(
-                DeviceType.RADIATOR,
-                id,
-                EventType.RADIATOR_RESTORED,
-                EventSource.USER,
-                "Radiator restored"
-        );
-        verify(logService).createLog(
-                DeviceType.RADIATOR,
-                id,
-                LogStatus.SUCCESS,
-                EventSource.USER,
-                "RESTORE_RADIATOR",
-                "Radiator restored successfully"
-        );
+        verify(deviceEventService)
+                .createEvent(
+                        DeviceType.RADIATOR, id, EventType.RADIATOR_RESTORED, EventSource.USER, "Radiator restored");
+        verify(logService)
+                .createLog(
+                        DeviceType.RADIATOR,
+                        id,
+                        LogStatus.SUCCESS,
+                        EventSource.USER,
+                        "RESTORE_RADIATOR",
+                        "Radiator restored successfully");
     }
 
     @DisplayName("Должен изменить online status, создать event и log")
@@ -249,32 +244,28 @@ class RadiatorServiceTest {
         assertFalse(result.getIsOnline());
 
         verify(radiatorRepository).findById(id);
-        verify(deviceEventService).createEvent(
-                DeviceType.RADIATOR,
-                id,
-                EventType.RADIATOR_OFFLINE,
-                EventSource.USER,
-                "Radiator online status changed to false"
-        );
-        verify(logService).createLog(
-                DeviceType.RADIATOR,
-                id,
-                LogStatus.SUCCESS,
-                EventSource.USER,
-                "CHANGE_ONLINE_STATUS",
-                "Radiator online status updated successfully"
-        );
+        verify(deviceEventService)
+                .createEvent(
+                        DeviceType.RADIATOR,
+                        id,
+                        EventType.RADIATOR_OFFLINE,
+                        EventSource.USER,
+                        "Radiator online status changed to false");
+        verify(logService)
+                .createLog(
+                        DeviceType.RADIATOR,
+                        id,
+                        LogStatus.SUCCESS,
+                        EventSource.USER,
+                        "CHANGE_ONLINE_STATUS",
+                        "Radiator online status updated successfully");
     }
 
     @DisplayName("Должен вызвать нужные методы в updateFromForm")
     @Test
     void shouldUpdateFromForm() {
-        RadiatorService spyService = spy(new RadiatorService(
-                radiatorRepository,
-                deviceEventService,
-                logService,
-                radiatorRuleRepository
-        ));
+        RadiatorService spyService =
+                spy(new RadiatorService(radiatorRepository, deviceEventService, logService, radiatorRuleRepository));
 
         Long id = 1L;
         EventSource source = EventSource.USER;

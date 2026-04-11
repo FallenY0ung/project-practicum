@@ -1,5 +1,10 @@
 package ru.tbank.practicum.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,12 +17,6 @@ import ru.tbank.practicum.enums.DeviceType;
 import ru.tbank.practicum.enums.EventSource;
 import ru.tbank.practicum.enums.EventType;
 import ru.tbank.practicum.repositories.DeviceEventRepository;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DeviceEventServiceTest {
@@ -32,13 +31,7 @@ class DeviceEventServiceTest {
     @Test
     void shouldReturnDeviceEventById() {
         DeviceEvent deviceEvent = createDeviceEvent(
-                1L,
-                DeviceType.BLINDS,
-                10L,
-                EventType.BLINDS_OPENED,
-                EventSource.USER,
-                "Blinds opened"
-        );
+                1L, DeviceType.BLINDS, 10L, EventType.BLINDS_OPENED, EventSource.USER, "Blinds opened");
 
         when(deviceEventRepository.findById(1L)).thenReturn(Optional.of(deviceEvent));
 
@@ -55,22 +48,10 @@ class DeviceEventServiceTest {
     @Test
     void shouldReturnAllDeviceEvents() {
         DeviceEvent event1 = createDeviceEvent(
-                1L,
-                DeviceType.BLINDS,
-                10L,
-                EventType.BLINDS_OPENED,
-                EventSource.USER,
-                "Blinds opened"
-        );
+                1L, DeviceType.BLINDS, 10L, EventType.BLINDS_OPENED, EventSource.USER, "Blinds opened");
 
         DeviceEvent event2 = createDeviceEvent(
-                2L,
-                DeviceType.BLINDS,
-                11L,
-                EventType.BLINDS_CLOSED,
-                EventSource.SYSTEM,
-                "Blinds closed"
-        );
+                2L, DeviceType.BLINDS, 11L, EventType.BLINDS_CLOSED, EventSource.SYSTEM, "Blinds closed");
 
         List<DeviceEvent> events = List.of(event1, event2);
 
@@ -90,23 +71,11 @@ class DeviceEventServiceTest {
         DeviceType deviceType = DeviceType.BLINDS;
         Long deviceId = 10L;
 
-        DeviceEvent event1 = createDeviceEvent(
-                1L,
-                deviceType,
-                deviceId,
-                EventType.BLINDS_OPENED,
-                EventSource.USER,
-                "Blinds opened"
-        );
+        DeviceEvent event1 =
+                createDeviceEvent(1L, deviceType, deviceId, EventType.BLINDS_OPENED, EventSource.USER, "Blinds opened");
 
         DeviceEvent event2 = createDeviceEvent(
-                2L,
-                deviceType,
-                deviceId,
-                EventType.BLINDS_CLOSED,
-                EventSource.SYSTEM,
-                "Blinds closed"
-        );
+                2L, deviceType, deviceId, EventType.BLINDS_CLOSED, EventSource.SYSTEM, "Blinds closed");
 
         List<DeviceEvent> events = List.of(event1, event2);
 
@@ -125,22 +94,10 @@ class DeviceEventServiceTest {
     @Test
     void shouldSaveDeviceEvent() {
         DeviceEvent deviceEvent = createDeviceEvent(
-                null,
-                DeviceType.BLINDS,
-                10L,
-                EventType.BLINDS_OPENED,
-                EventSource.USER,
-                "Blinds opened"
-        );
+                null, DeviceType.BLINDS, 10L, EventType.BLINDS_OPENED, EventSource.USER, "Blinds opened");
 
         DeviceEvent savedEvent = createDeviceEvent(
-                1L,
-                DeviceType.BLINDS,
-                10L,
-                EventType.BLINDS_OPENED,
-                EventSource.USER,
-                "Blinds opened"
-        );
+                1L, DeviceType.BLINDS, 10L, EventType.BLINDS_OPENED, EventSource.USER, "Blinds opened");
 
         when(deviceEventRepository.save(deviceEvent)).thenReturn(savedEvent);
 
@@ -162,24 +119,11 @@ class DeviceEventServiceTest {
         EventSource source = EventSource.USER;
         String message = "Blinds opened";
 
-        DeviceEvent savedEvent = createDeviceEvent(
-                1L,
-                deviceType,
-                deviceId,
-                eventType,
-                source,
-                message
-        );
+        DeviceEvent savedEvent = createDeviceEvent(1L, deviceType, deviceId, eventType, source, message);
 
         when(deviceEventRepository.save(any(DeviceEvent.class))).thenReturn(savedEvent);
 
-        DeviceEvent result = deviceEventService.createEvent(
-                deviceType,
-                deviceId,
-                eventType,
-                source,
-                message
-        );
+        DeviceEvent result = deviceEventService.createEvent(deviceType, deviceId, eventType, source, message);
 
         assertSame(savedEvent, result);
         assertEquals(1L, result.getId());
@@ -196,13 +140,7 @@ class DeviceEventServiceTest {
     }
 
     private DeviceEvent createDeviceEvent(
-            Long id,
-            DeviceType deviceType,
-            Long deviceId,
-            EventType eventType,
-            EventSource source,
-            String message
-    ) {
+            Long id, DeviceType deviceType, Long deviceId, EventType eventType, EventSource source, String message) {
         DeviceEvent deviceEvent = DeviceEvent.builder()
                 .deviceType(deviceType)
                 .deviceId(deviceId)

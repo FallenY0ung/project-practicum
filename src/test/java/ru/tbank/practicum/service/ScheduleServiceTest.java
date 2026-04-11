@@ -1,5 +1,11 @@
 package ru.tbank.practicum.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,13 +18,6 @@ import ru.tbank.practicum.enums.DeviceType;
 import ru.tbank.practicum.enums.EventSource;
 import ru.tbank.practicum.enums.LogStatus;
 import ru.tbank.practicum.repositories.ScheduleRepository;
-
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ScheduleServiceTest {
@@ -35,13 +34,7 @@ class ScheduleServiceTest {
     @DisplayName("Должен вернуть schedule по id")
     @Test
     void shouldReturnScheduleById() {
-        Schedule schedule = createSchedule(
-                1L,
-                10L,
-                LocalTime.of(8, 0),
-                LocalTime.of(20, 0),
-                true
-        );
+        Schedule schedule = createSchedule(1L, 10L, LocalTime.of(8, 0), LocalTime.of(20, 0), true);
 
         when(scheduleRepository.findById(1L)).thenReturn(Optional.of(schedule));
 
@@ -56,21 +49,9 @@ class ScheduleServiceTest {
     @DisplayName("Должен вернуть все schedules")
     @Test
     void shouldReturnAllSchedules() {
-        Schedule schedule1 = createSchedule(
-                1L,
-                10L,
-                LocalTime.of(8, 0),
-                LocalTime.of(20, 0),
-                true
-        );
+        Schedule schedule1 = createSchedule(1L, 10L, LocalTime.of(8, 0), LocalTime.of(20, 0), true);
 
-        Schedule schedule2 = createSchedule(
-                2L,
-                10L,
-                LocalTime.of(9, 0),
-                LocalTime.of(21, 0),
-                false
-        );
+        Schedule schedule2 = createSchedule(2L, 10L, LocalTime.of(9, 0), LocalTime.of(21, 0), false);
 
         List<Schedule> schedules = List.of(schedule1, schedule2);
 
@@ -89,21 +70,9 @@ class ScheduleServiceTest {
     void shouldReturnActiveSchedulesByBlindsId() {
         Long blindsId = 10L;
 
-        Schedule schedule1 = createSchedule(
-                1L,
-                blindsId,
-                LocalTime.of(8, 0),
-                LocalTime.of(20, 0),
-                true
-        );
+        Schedule schedule1 = createSchedule(1L, blindsId, LocalTime.of(8, 0), LocalTime.of(20, 0), true);
 
-        Schedule schedule2 = createSchedule(
-                2L,
-                blindsId,
-                LocalTime.of(9, 0),
-                LocalTime.of(21, 0),
-                true
-        );
+        Schedule schedule2 = createSchedule(2L, blindsId, LocalTime.of(9, 0), LocalTime.of(21, 0), true);
 
         List<Schedule> schedules = List.of(schedule1, schedule2);
 
@@ -122,21 +91,9 @@ class ScheduleServiceTest {
     void shouldReturnSchedulesByBlindsId() {
         Long blindsId = 10L;
 
-        Schedule schedule1 = createSchedule(
-                1L,
-                blindsId,
-                LocalTime.of(8, 0),
-                LocalTime.of(20, 0),
-                true
-        );
+        Schedule schedule1 = createSchedule(1L, blindsId, LocalTime.of(8, 0), LocalTime.of(20, 0), true);
 
-        Schedule schedule2 = createSchedule(
-                2L,
-                blindsId,
-                LocalTime.of(9, 0),
-                LocalTime.of(21, 0),
-                false
-        );
+        Schedule schedule2 = createSchedule(2L, blindsId, LocalTime.of(9, 0), LocalTime.of(21, 0), false);
 
         List<Schedule> schedules = List.of(schedule1, schedule2);
 
@@ -156,48 +113,30 @@ class ScheduleServiceTest {
         Long id = 1L;
         EventSource source = EventSource.USER;
 
-        Schedule schedule = createSchedule(
-                id,
-                10L,
-                LocalTime.of(8, 0),
-                LocalTime.of(20, 0),
-                true
-        );
+        Schedule schedule = createSchedule(id, 10L, LocalTime.of(8, 0), LocalTime.of(20, 0), true);
 
         when(scheduleRepository.findById(id)).thenReturn(Optional.of(schedule));
 
         scheduleService.deleteById(id, source);
 
         verify(scheduleRepository).findById(id);
-        verify(logService).createLog(
-                DeviceType.RADIATOR,
-                schedule.getId(),
-                LogStatus.WARNING,
-                source,
-                "DELETE_RADIATOR_RULE",
-                "Radiator rule was deleted"
-        );
+        verify(logService)
+                .createLog(
+                        DeviceType.RADIATOR,
+                        schedule.getId(),
+                        LogStatus.WARNING,
+                        source,
+                        "DELETE_RADIATOR_RULE",
+                        "Radiator rule was deleted");
         verify(scheduleRepository).delete(schedule);
     }
 
     @DisplayName("Должен сохранить schedule и создать лог")
     @Test
     void shouldSaveSchedule() {
-        Schedule schedule = createSchedule(
-                null,
-                10L,
-                LocalTime.of(8, 0),
-                LocalTime.of(20, 0),
-                true
-        );
+        Schedule schedule = createSchedule(null, 10L, LocalTime.of(8, 0), LocalTime.of(20, 0), true);
 
-        Schedule savedSchedule = createSchedule(
-                1L,
-                10L,
-                LocalTime.of(8, 0),
-                LocalTime.of(20, 0),
-                true
-        );
+        Schedule savedSchedule = createSchedule(1L, 10L, LocalTime.of(8, 0), LocalTime.of(20, 0), true);
 
         when(scheduleRepository.save(schedule)).thenReturn(savedSchedule);
 
@@ -207,14 +146,14 @@ class ScheduleServiceTest {
         assertEquals(1L, result.getId());
 
         verify(scheduleRepository).save(schedule);
-        verify(logService).createLog(
-                DeviceType.BLINDS,
-                10L,
-                LogStatus.SUCCESS,
-                EventSource.SYSTEM,
-                "CREATE_SCHEDULE",
-                "Schedule was created successfully"
-        );
+        verify(logService)
+                .createLog(
+                        DeviceType.BLINDS,
+                        10L,
+                        LogStatus.SUCCESS,
+                        EventSource.SYSTEM,
+                        "CREATE_SCHEDULE",
+                        "Schedule was created successfully");
     }
 
     @DisplayName("Должен обновить schedule и создать лог")
@@ -222,13 +161,7 @@ class ScheduleServiceTest {
     void shouldUpdateSchedule() {
         Long id = 1L;
 
-        Schedule schedule = createSchedule(
-                id,
-                10L,
-                LocalTime.of(8, 0),
-                LocalTime.of(20, 0),
-                true
-        );
+        Schedule schedule = createSchedule(id, 10L, LocalTime.of(8, 0), LocalTime.of(20, 0), true);
 
         LocalTime newOpenAt = LocalTime.of(9, 0);
         LocalTime newCloseAt = LocalTime.of(21, 0);
@@ -244,23 +177,18 @@ class ScheduleServiceTest {
         assertEquals(newEnabled, result.getEnabled());
 
         verify(scheduleRepository).findById(id);
-        verify(logService).createLog(
-                DeviceType.BLINDS,
-                10L,
-                LogStatus.SUCCESS,
-                EventSource.SYSTEM,
-                "UPDATE_SCHEDULE",
-                "Schedule was updated successfully"
-        );
+        verify(logService)
+                .createLog(
+                        DeviceType.BLINDS,
+                        10L,
+                        LogStatus.SUCCESS,
+                        EventSource.SYSTEM,
+                        "UPDATE_SCHEDULE",
+                        "Schedule was updated successfully");
     }
 
     private Schedule createSchedule(
-            Long scheduleId,
-            Long blindsId,
-            LocalTime openAt,
-            LocalTime closeAt,
-            Boolean enabled
-    ) {
+            Long scheduleId, Long blindsId, LocalTime openAt, LocalTime closeAt, Boolean enabled) {
         Blinds blinds = new Blinds();
         blinds.setId(blindsId);
 

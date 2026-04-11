@@ -1,19 +1,5 @@
 package ru.tbank.practicum.controller.web;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.web.servlet.MockMvc;
-import ru.tbank.practicum.entity.Blinds;
-import ru.tbank.practicum.entity.Schedule;
-import ru.tbank.practicum.enums.EventSource;
-import ru.tbank.practicum.service.BlindsService;
-import ru.tbank.practicum.service.ScheduleService;
-
-import java.util.List;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -24,6 +10,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import ru.tbank.practicum.entity.Blinds;
+import ru.tbank.practicum.entity.Schedule;
+import ru.tbank.practicum.enums.EventSource;
+import ru.tbank.practicum.service.BlindsService;
+import ru.tbank.practicum.service.ScheduleService;
 
 @WebMvcTest(BlindsController.class)
 public class BlindsControllerTest {
@@ -58,21 +57,19 @@ public class BlindsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("blinds/new"))
                 .andExpect(model().attributeExists("blinds"));
-
     }
 
     @DisplayName("Должен сохранить Blinds")
     @Test
     void shouldRedirectAndSaveBlinds() throws Exception {
         mockMvc.perform(post("/blinds")
-                    .param("state", "OPEN")
-                    .param("isOnline", "true")
-                    .param("isBroken", "false"))
+                        .param("state", "OPEN")
+                        .param("isOnline", "true")
+                        .param("isBroken", "false"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/blinds"));
 
         verify(blindsService).save(any(Blinds.class));
-
     }
 
     @DisplayName("Должен изменить Blinds")
@@ -85,7 +82,7 @@ public class BlindsControllerTest {
         when(blindsService.getById(id)).thenReturn(blinds);
         when(scheduleService.getByBlindsId(id)).thenReturn(List.of(new Schedule()));
 
-        mockMvc.perform(get("/blinds/1/edit" ))
+        mockMvc.perform(get("/blinds/1/edit"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("blinds/edit"))
                 .andExpect(model().attributeExists("blinds"))
@@ -94,7 +91,6 @@ public class BlindsControllerTest {
 
         verify(blindsService).getById(id);
         verify(scheduleService).getByBlindsId(id);
-
     }
 
     @DisplayName("Должен добавить правило Schedule")
@@ -107,9 +103,9 @@ public class BlindsControllerTest {
         when(blindsService.getById(blindsId)).thenReturn(blinds);
 
         mockMvc.perform(post("/blinds/1/schedules")
-                    .param("openAt", "08:00")
-                    .param("closeAt", "09:00")
-                    .param("enabled", "true"))
+                        .param("openAt", "08:00")
+                        .param("closeAt", "09:00")
+                        .param("enabled", "true"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/blinds/1/edit"));
 
@@ -133,9 +129,9 @@ public class BlindsControllerTest {
     void shouldUpdateBlinds() throws Exception {
 
         mockMvc.perform(post("/blinds/1")
-                .param("state", "OPEN")
-                .param("isOnline", "true")
-                .param("isBroken", "false"))
+                        .param("state", "OPEN")
+                        .param("isOnline", "true")
+                        .param("isBroken", "false"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/blinds"));
 

@@ -1,5 +1,12 @@
 package ru.tbank.practicum.controller.web;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +26,6 @@ import ru.tbank.practicum.service.ScheduleService;
 import ru.tbank.practicum.service.SmartHomeService;
 import ru.tbank.practicum.service.WeatherService;
 import ru.tbank.practicum.service.WeatherSyncService;
-
-import java.util.List;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(DashboardController.class)
 class DashboardControllerTest {
@@ -66,9 +65,12 @@ class DashboardControllerTest {
         when(weatherService.getLatest()).thenReturn(weather);
         when(radiatorService.getAll()).thenReturn(List.of(new Radiator(), new Radiator()));
         when(blindsService.getAll()).thenReturn(List.of(new Blinds()));
-        when(radiatorRuleService.getAll()).thenReturn(List.of(new RadiatorRule(), new RadiatorRule(), new RadiatorRule()));
-        when(scheduleService.getAll()).thenReturn(List.of(new Schedule(), new Schedule(), new Schedule(), new Schedule()));
-        when(weatherService.getAll()).thenReturn(List.of(new Weather(), new Weather(), new Weather(), new Weather(), new Weather()));
+        when(radiatorRuleService.getAll())
+                .thenReturn(List.of(new RadiatorRule(), new RadiatorRule(), new RadiatorRule()));
+        when(scheduleService.getAll())
+                .thenReturn(List.of(new Schedule(), new Schedule(), new Schedule(), new Schedule()));
+        when(weatherService.getAll())
+                .thenReturn(List.of(new Weather(), new Weather(), new Weather(), new Weather(), new Weather()));
         when(weatherProperties.city()).thenReturn("Moscow");
 
         mockMvc.perform(get("/dashboard"))

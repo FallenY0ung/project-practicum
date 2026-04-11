@@ -1,5 +1,8 @@
 package ru.tbank.practicum.service;
 
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,12 +14,6 @@ import ru.tbank.practicum.enums.BlindsState;
 import ru.tbank.practicum.enums.EventSource;
 import ru.tbank.practicum.repositories.BlindsRepository;
 import ru.tbank.practicum.repositories.ScheduleRepository;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BlindsServiceUpdateFromFormTest {
@@ -37,12 +34,7 @@ class BlindsServiceUpdateFromFormTest {
 
     @BeforeEach
     void setUp() {
-        blindsService = spy(new BlindsService(
-                blindsRepository,
-                deviceEventService,
-                logService,
-                scheduleRepository
-        ));
+        blindsService = spy(new BlindsService(blindsRepository, deviceEventService, logService, scheduleRepository));
     }
 
     @DisplayName("Должен ничего не менять, если форма не содержит изменений")
@@ -182,7 +174,6 @@ class BlindsServiceUpdateFromFormTest {
         verify(blindsService).markAsBroken(id, source);
         verify(blindsService, never()).restore(anyLong(), any());
     }
-
 
     private Blinds createBlinds(Long id, BlindsState state, Boolean isOnline, Boolean isBroken) {
         Blinds blinds = new Blinds();

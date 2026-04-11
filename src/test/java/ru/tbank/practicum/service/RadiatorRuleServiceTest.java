@@ -1,5 +1,11 @@
 package ru.tbank.practicum.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,13 +18,6 @@ import ru.tbank.practicum.enums.DeviceType;
 import ru.tbank.practicum.enums.EventSource;
 import ru.tbank.practicum.enums.LogStatus;
 import ru.tbank.practicum.repositories.RadiatorRuleRepository;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RadiatorRuleServiceTest {
@@ -35,14 +34,8 @@ class RadiatorRuleServiceTest {
     @DisplayName("Должен вернуть правило по id")
     @Test
     void shouldReturnRadiatorRuleById() {
-        RadiatorRule radiatorRule = createRadiatorRule(
-                1L,
-                10L,
-                new BigDecimal("0"),
-                new BigDecimal("10"),
-                new BigDecimal("22"),
-                true
-        );
+        RadiatorRule radiatorRule =
+                createRadiatorRule(1L, 10L, new BigDecimal("0"), new BigDecimal("10"), new BigDecimal("22"), true);
 
         when(radiatorRuleRepository.findById(1L)).thenReturn(Optional.of(radiatorRule));
 
@@ -56,23 +49,11 @@ class RadiatorRuleServiceTest {
     @DisplayName("Должен вернуть все правила")
     @Test
     void shouldReturnAllRadiatorRules() {
-        RadiatorRule rule1 = createRadiatorRule(
-                1L,
-                10L,
-                new BigDecimal("0"),
-                new BigDecimal("10"),
-                new BigDecimal("22"),
-                true
-        );
+        RadiatorRule rule1 =
+                createRadiatorRule(1L, 10L, new BigDecimal("0"), new BigDecimal("10"), new BigDecimal("22"), true);
 
-        RadiatorRule rule2 = createRadiatorRule(
-                2L,
-                10L,
-                new BigDecimal("11"),
-                new BigDecimal("20"),
-                new BigDecimal("24"),
-                true
-        );
+        RadiatorRule rule2 =
+                createRadiatorRule(2L, 10L, new BigDecimal("11"), new BigDecimal("20"), new BigDecimal("24"), true);
 
         List<RadiatorRule> rules = List.of(rule1, rule2);
 
@@ -91,22 +72,10 @@ class RadiatorRuleServiceTest {
         Long radiatorId = 10L;
 
         RadiatorRule rule1 = createRadiatorRule(
-                1L,
-                radiatorId,
-                new BigDecimal("0"),
-                new BigDecimal("10"),
-                new BigDecimal("22"),
-                true
-        );
+                1L, radiatorId, new BigDecimal("0"), new BigDecimal("10"), new BigDecimal("22"), true);
 
         RadiatorRule rule2 = createRadiatorRule(
-                2L,
-                radiatorId,
-                new BigDecimal("11"),
-                new BigDecimal("20"),
-                new BigDecimal("24"),
-                true
-        );
+                2L, radiatorId, new BigDecimal("11"), new BigDecimal("20"), new BigDecimal("24"), true);
 
         List<RadiatorRule> rules = List.of(rule1, rule2);
 
@@ -125,22 +94,10 @@ class RadiatorRuleServiceTest {
         Long radiatorId = 10L;
 
         RadiatorRule rule1 = createRadiatorRule(
-                1L,
-                radiatorId,
-                new BigDecimal("0"),
-                new BigDecimal("10"),
-                new BigDecimal("22"),
-                true
-        );
+                1L, radiatorId, new BigDecimal("0"), new BigDecimal("10"), new BigDecimal("22"), true);
 
         RadiatorRule rule2 = createRadiatorRule(
-                2L,
-                radiatorId,
-                new BigDecimal("11"),
-                new BigDecimal("20"),
-                new BigDecimal("24"),
-                false
-        );
+                2L, radiatorId, new BigDecimal("11"), new BigDecimal("20"), new BigDecimal("24"), false);
 
         List<RadiatorRule> rules = List.of(rule1, rule2);
 
@@ -159,51 +116,33 @@ class RadiatorRuleServiceTest {
         Long id = 1L;
         EventSource source = EventSource.USER;
 
-        RadiatorRule radiatorRule = createRadiatorRule(
-                id,
-                10L,
-                new BigDecimal("0"),
-                new BigDecimal("10"),
-                new BigDecimal("22"),
-                true
-        );
+        RadiatorRule radiatorRule =
+                createRadiatorRule(id, 10L, new BigDecimal("0"), new BigDecimal("10"), new BigDecimal("22"), true);
 
         when(radiatorRuleRepository.findById(id)).thenReturn(Optional.of(radiatorRule));
 
         radiatorRuleService.deleteById(id, source);
 
         verify(radiatorRuleRepository).findById(id);
-        verify(logService).createLog(
-                DeviceType.RADIATOR,
-                radiatorRule.getId(),
-                LogStatus.WARNING,
-                source,
-                "DELETE_RADIATOR_RULE",
-                "Radiator rule was deleted"
-        );
+        verify(logService)
+                .createLog(
+                        DeviceType.RADIATOR,
+                        radiatorRule.getId(),
+                        LogStatus.WARNING,
+                        source,
+                        "DELETE_RADIATOR_RULE",
+                        "Radiator rule was deleted");
         verify(radiatorRuleRepository).delete(radiatorRule);
     }
 
     @DisplayName("Должен сохранить правило и создать лог")
     @Test
     void shouldSaveRadiatorRule() {
-        RadiatorRule radiatorRule = createRadiatorRule(
-                null,
-                10L,
-                new BigDecimal("0"),
-                new BigDecimal("10"),
-                new BigDecimal("22"),
-                true
-        );
+        RadiatorRule radiatorRule =
+                createRadiatorRule(null, 10L, new BigDecimal("0"), new BigDecimal("10"), new BigDecimal("22"), true);
 
-        RadiatorRule savedRule = createRadiatorRule(
-                1L,
-                10L,
-                new BigDecimal("0"),
-                new BigDecimal("10"),
-                new BigDecimal("22"),
-                true
-        );
+        RadiatorRule savedRule =
+                createRadiatorRule(1L, 10L, new BigDecimal("0"), new BigDecimal("10"), new BigDecimal("22"), true);
 
         when(radiatorRuleRepository.save(radiatorRule)).thenReturn(savedRule);
 
@@ -213,14 +152,14 @@ class RadiatorRuleServiceTest {
         assertEquals(1L, result.getId());
 
         verify(radiatorRuleRepository).save(radiatorRule);
-        verify(logService).createLog(
-                DeviceType.RADIATOR,
-                10L,
-                LogStatus.SUCCESS,
-                EventSource.SYSTEM,
-                "CREATE_RADIATOR_RULE",
-                "Radiator rule was created successfully"
-        );
+        verify(logService)
+                .createLog(
+                        DeviceType.RADIATOR,
+                        10L,
+                        LogStatus.SUCCESS,
+                        EventSource.SYSTEM,
+                        "CREATE_RADIATOR_RULE",
+                        "Radiator rule was created successfully");
     }
 
     @DisplayName("Должен обновить правило и создать лог")
@@ -228,14 +167,8 @@ class RadiatorRuleServiceTest {
     void shouldUpdateRadiatorRule() {
         Long id = 1L;
 
-        RadiatorRule radiatorRule = createRadiatorRule(
-                id,
-                10L,
-                new BigDecimal("0"),
-                new BigDecimal("10"),
-                new BigDecimal("22"),
-                true
-        );
+        RadiatorRule radiatorRule =
+                createRadiatorRule(id, 10L, new BigDecimal("0"), new BigDecimal("10"), new BigDecimal("22"), true);
 
         BigDecimal newMin = new BigDecimal("5");
         BigDecimal newMax = new BigDecimal("15");
@@ -244,13 +177,7 @@ class RadiatorRuleServiceTest {
 
         when(radiatorRuleRepository.findById(id)).thenReturn(Optional.of(radiatorRule));
 
-        RadiatorRule result = radiatorRuleService.updateRadiatorRule(
-                id,
-                newMin,
-                newMax,
-                newTarget,
-                newEnabled
-        );
+        RadiatorRule result = radiatorRuleService.updateRadiatorRule(id, newMin, newMax, newTarget, newEnabled);
 
         assertSame(radiatorRule, result);
         assertEquals(newMin, result.getMinOutsideTemp());
@@ -259,14 +186,14 @@ class RadiatorRuleServiceTest {
         assertEquals(newEnabled, result.getEnabled());
 
         verify(radiatorRuleRepository).findById(id);
-        verify(logService).createLog(
-                DeviceType.RADIATOR,
-                10L,
-                LogStatus.SUCCESS,
-                EventSource.SYSTEM,
-                "UPDATE_RADIATOR_RULE",
-                "Radiator rule was updated successfully"
-        );
+        verify(logService)
+                .createLog(
+                        DeviceType.RADIATOR,
+                        10L,
+                        LogStatus.SUCCESS,
+                        EventSource.SYSTEM,
+                        "UPDATE_RADIATOR_RULE",
+                        "Radiator rule was updated successfully");
     }
 
     private RadiatorRule createRadiatorRule(
@@ -275,8 +202,7 @@ class RadiatorRuleServiceTest {
             BigDecimal minOutsideTemp,
             BigDecimal maxOutsideTemp,
             BigDecimal targetRadiatorTemp,
-            Boolean enabled
-    ) {
+            Boolean enabled) {
         Radiator radiator = new Radiator();
         radiator.setId(radiatorId);
 

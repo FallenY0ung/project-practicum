@@ -94,8 +94,7 @@ public class BlindsService {
                 blinds.getId(),
                 mapStateToEventType(newState),
                 source,
-                "Blinds state changed from " + oldState + " to " + newState
-        );
+                "Blinds state changed from " + oldState + " to " + newState);
 
         logService.createLog(
                 DeviceType.BLINDS,
@@ -151,11 +150,7 @@ public class BlindsService {
         log.info("Blinds {} marked as broken", id);
 
         deviceEventService.createEvent(
-                DeviceType.BLINDS,
-                blinds.getId(),
-                EventType.BLINDS_BROKEN,
-                source,
-                "Blinds marked as broken");
+                DeviceType.BLINDS, blinds.getId(), EventType.BLINDS_BROKEN, source, "Blinds marked as broken");
 
         logService.createLog(
                 DeviceType.BLINDS,
@@ -181,12 +176,7 @@ public class BlindsService {
         log.info("Blinds {} restored", id);
 
         deviceEventService.createEvent(
-                DeviceType.BLINDS,
-                blinds.getId(),
-                EventType.BLINDS_RESTORED,
-                source,
-                "Blinds restored"
-        );
+                DeviceType.BLINDS, blinds.getId(), EventType.BLINDS_RESTORED, source, "Blinds restored");
 
         logService.createLog(
                 DeviceType.BLINDS,
@@ -194,13 +184,12 @@ public class BlindsService {
                 LogStatus.SUCCESS,
                 source,
                 "RESTORE_BLINDS",
-                "Blinds restored successfully"
-        );
+                "Blinds restored successfully");
 
         return blinds;
     }
 
-     EventType mapStateToEventType(BlindsState state) {
+    EventType mapStateToEventType(BlindsState state) {
         return switch (state) {
             case OPEN -> EventType.BLINDS_OPENED;
             case CLOSED -> EventType.BLINDS_CLOSED;
