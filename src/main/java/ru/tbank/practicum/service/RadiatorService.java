@@ -13,6 +13,9 @@ import ru.tbank.practicum.enums.DeviceType;
 import ru.tbank.practicum.enums.EventSource;
 import ru.tbank.practicum.enums.EventType;
 import ru.tbank.practicum.enums.LogStatus;
+import ru.tbank.practicum.kafka.KafkaCommandProducer;
+import ru.tbank.practicum.kafka.dto.BlindsCommandMessage;
+import ru.tbank.practicum.kafka.dto.RadiatorCommandMessage;
 import ru.tbank.practicum.repositories.RadiatorRepository;
 import ru.tbank.practicum.repositories.RadiatorRuleRepository;
 
@@ -26,6 +29,7 @@ public class RadiatorService {
     private final DeviceEventService deviceEventService;
     private final LogService logService;
     private final RadiatorRuleRepository radiatorRuleRepository;
+    private final KafkaCommandProducer kafkaCommandProducer;
 
     @Transactional(readOnly = true)
     public Radiator getById(Long id) {
@@ -111,6 +115,17 @@ public class RadiatorService {
                 source,
                 "UPDATE_TEMPERATURE",
                 "Radiator temperature changed from " + oldTemp + " to " + newTemp);
+
+        if (source == EventSource.USER || source == EventSource.WEATHER_RULE) {
+            kafkaCommandProducer.sendRadiatorCommand(
+                    new RadiatorCommandMessage(
+                            radiator.getId(),
+                            newTemp,
+                            source,
+                            java.time.Instant.now()
+                    )
+            );
+        }
 
         return radiator;
     }

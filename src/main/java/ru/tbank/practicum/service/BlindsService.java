@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.tbank.practicum.entity.Blinds;
 import ru.tbank.practicum.entity.Schedule;
 import ru.tbank.practicum.enums.*;
+import ru.tbank.practicum.kafka.KafkaCommandProducer;
+import ru.tbank.practicum.kafka.dto.BlindsCommandMessage;
 import ru.tbank.practicum.repositories.BlindsRepository;
 import ru.tbank.practicum.repositories.ScheduleRepository;
 
@@ -22,6 +24,7 @@ public class BlindsService {
     private final DeviceEventService deviceEventService;
     private final LogService logService;
     private final ScheduleRepository scheduleRepository;
+    private final KafkaCommandProducer kafkaCommandProducer;
 
     @Transactional(readOnly = true)
     public Blinds getById(Long id) {
@@ -103,6 +106,17 @@ public class BlindsService {
                 source,
                 "UPDATE_BLINDS_STATE",
                 "Blinds state changed from " + oldState + " to " + newState);
+
+        if (source == EventSource.USER || source == EventSource.SCHEDULE) {
+            kafkaCommandProducer.sendBlindsCommand(
+                    new BlindsCommandMessage(
+                            blinds.getId(),
+                            newState.name(),
+                            source,
+                            java.time.Instant.now()
+                    )
+            );
+        }
 
         return blinds;
     }
