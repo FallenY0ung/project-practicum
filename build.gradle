@@ -23,24 +23,40 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-liquibase'
+    implementation 'org.springframework.kafka:spring-kafka'
+
     runtimeOnly 'org.postgresql:postgresql'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:testcontainers-junit-jupiter:2.0.4'
+    testImplementation 'org.testcontainers:testcontainers-postgresql:2.0.4'
+    testImplementation 'org.testcontainers:testcontainers'
+    testImplementation 'org.wiremock:wiremock-standalone:3.13.2'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-
 }
 
 test {
-    useJUnitPlatform()
+    useJUnitPlatform(){
+        excludeTags 'integration'
+    }
     finalizedBy jacocoTestReport
 }
 
+tasks.register('integrationTest', Test) {
+    group = 'verification'
+    description = 'Runs integration tests.'
+    useJUnitPlatform {
+        includeTags 'integration'
+    }
+    shouldRunAfter test
+}
 
 jacocoTestReport {
     dependsOn test
@@ -63,20 +79,35 @@ jacocoTestReport {
     }
 }
 
-tasks.named('jacocoTestReport') {
-    dependsOn tasks.test
-    reports {
-        xml.required = true
-        html.required = true
-        csv.required = false
+jacocoTestCoverageVerification {
+    dependsOn test
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect { dir ->
+            fileTree(dir: dir, exclude: [
+                    '**/dto/**',
+                    '**/*Dto.class',
+                    '**/config/**',
+                    '**/*Application.class'
+            ])
+        }))
+    }
+
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.50
+            }
+        }
     }
 }
 
-// ----- Linter -----
+check.dependsOn jacocoTestCoverageVerification
 
 spotless {
     java {
         palantirJavaFormat().formatJavadoc(true)
     }
 }
-
