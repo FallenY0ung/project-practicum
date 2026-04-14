@@ -189,7 +189,7 @@ public class BlindsService {
         return blinds;
     }
 
-    private EventType mapStateToEventType(BlindsState state) {
+    EventType mapStateToEventType(BlindsState state) {
         return switch (state) {
             case OPEN -> EventType.BLINDS_OPENED;
             case CLOSED -> EventType.BLINDS_CLOSED;
