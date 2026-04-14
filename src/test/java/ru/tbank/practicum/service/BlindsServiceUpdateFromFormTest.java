@@ -38,7 +38,8 @@ class BlindsServiceUpdateFromFormTest {
 
     @BeforeEach
     void setUp() {
-        blindsService = spy(new BlindsService(blindsRepository, deviceEventService, logService, scheduleRepository, kafkaCommandProducer));
+        blindsService = spy(new BlindsService(
+                blindsRepository, deviceEventService, logService, scheduleRepository, kafkaCommandProducer));
     }
 
     @DisplayName("Должен ничего не менять, если форма не содержит изменений")

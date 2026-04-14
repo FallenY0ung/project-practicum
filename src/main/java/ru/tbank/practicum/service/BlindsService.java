@@ -109,13 +109,7 @@ public class BlindsService {
 
         if (source == EventSource.USER || source == EventSource.SCHEDULE) {
             kafkaCommandProducer.sendBlindsCommand(
-                    new BlindsCommandMessage(
-                            blinds.getId(),
-                            newState.name(),
-                            source,
-                            java.time.Instant.now()
-                    )
-            );
+                    new BlindsCommandMessage(blinds.getId(), newState.name(), source, java.time.Instant.now()));
         }
 
         return blinds;

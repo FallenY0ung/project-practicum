@@ -32,11 +32,7 @@ public class KafkaConsumerConfig {
                 new JacksonJsonDeserializer<>(DeviceEventMessage.class);
         deserializer.addTrustedPackages("ru.tbank.practicum.kafka.dto");
 
-        return new DefaultKafkaConsumerFactory<>(
-                props,
-                new StringDeserializer(),
-                deserializer
-        );
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
     }
 
     @Bean(name = "kafkaListenerContainerFactory")

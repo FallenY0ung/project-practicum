@@ -18,10 +18,7 @@ public class KafkaDeviceEventListener {
     private final BlindsService blindsService;
     private final RadiatorService radiatorService;
 
-    @KafkaListener(
-            topics = "devices.events",
-            groupId = "homeapp-device-events"
-    )
+    @KafkaListener(topics = "devices.events", groupId = "homeapp-device-events")
     public void listen(DeviceEventMessage message) {
         log.info("Received device event from Kafka: {}", message);
 

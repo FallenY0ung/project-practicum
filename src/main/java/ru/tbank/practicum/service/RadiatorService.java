@@ -14,7 +14,6 @@ import ru.tbank.practicum.enums.EventSource;
 import ru.tbank.practicum.enums.EventType;
 import ru.tbank.practicum.enums.LogStatus;
 import ru.tbank.practicum.kafka.KafkaCommandProducer;
-import ru.tbank.practicum.kafka.dto.BlindsCommandMessage;
 import ru.tbank.practicum.kafka.dto.RadiatorCommandMessage;
 import ru.tbank.practicum.repositories.RadiatorRepository;
 import ru.tbank.practicum.repositories.RadiatorRuleRepository;
@@ -118,13 +117,7 @@ public class RadiatorService {
 
         if (source == EventSource.USER || source == EventSource.WEATHER_RULE) {
             kafkaCommandProducer.sendRadiatorCommand(
-                    new RadiatorCommandMessage(
-                            radiator.getId(),
-                            newTemp,
-                            source,
-                            java.time.Instant.now()
-                    )
-            );
+                    new RadiatorCommandMessage(radiator.getId(), newTemp, source, java.time.Instant.now()));
         }
 
         return radiator;

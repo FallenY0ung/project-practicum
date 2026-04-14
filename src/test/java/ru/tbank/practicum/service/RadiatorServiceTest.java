@@ -268,8 +268,8 @@ class RadiatorServiceTest {
     @DisplayName("Должен вызвать нужные методы в updateFromForm")
     @Test
     void shouldUpdateFromForm() {
-        RadiatorService spyService =
-                spy(new RadiatorService(radiatorRepository, deviceEventService, logService, radiatorRuleRepository, kafkaCommandProducer));
+        RadiatorService spyService = spy(new RadiatorService(
+                radiatorRepository, deviceEventService, logService, radiatorRuleRepository, kafkaCommandProducer));
 
         Long id = 1L;
         EventSource source = EventSource.USER;
