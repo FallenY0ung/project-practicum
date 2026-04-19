@@ -7,10 +7,10 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
 import ru.tbank.practicum.kafka.dto.BlindsCommandMessage;
 import ru.tbank.practicum.kafka.dto.RadiatorCommandMessage;
 
