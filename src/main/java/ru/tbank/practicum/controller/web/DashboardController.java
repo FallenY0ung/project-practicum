@@ -15,6 +15,7 @@ import ru.tbank.practicum.service.RadiatorRuleService;
 import ru.tbank.practicum.service.RadiatorService;
 import ru.tbank.practicum.service.ScheduleService;
 import ru.tbank.practicum.service.SmartHomeService;
+import ru.tbank.practicum.service.WeatherAdviceService;
 import ru.tbank.practicum.service.WeatherService;
 import ru.tbank.practicum.service.WeatherSyncService;
 
@@ -32,14 +33,26 @@ public class DashboardController {
     private final WeatherSyncService weatherSyncService;
     private final SmartHomeService smartHomeService;
     private final WeatherProperties weatherProperties;
+    private final WeatherAdviceService weatherAdviceService;
 
-    @GetMapping
+    @GetMapping()
     public String dashboard(Model model) {
         Weather latestWeather = null;
+        String aiAdvice = null;
+
         try {
             latestWeather = weatherService.getLatest();
         } catch (Exception e) {
             log.warn("Failed to load latest weather", e);
+        }
+
+        if (latestWeather != null) {
+            try {
+                aiAdvice = weatherAdviceService.getAdvice(latestWeather);
+            } catch (Exception e) {
+                log.warn("Failed to load AI weather advice", e);
+                aiAdvice = "Не удалось получить рекомендацию от ИИ.";
+            }
         }
 
         model.addAttribute("radiatorsCount", radiatorService.getAll().size());
@@ -48,6 +61,7 @@ public class DashboardController {
         model.addAttribute("schedulesCount", scheduleService.getAll().size());
         model.addAttribute("weatherCount", weatherService.getAll().size());
         model.addAttribute("latestWeather", latestWeather);
+        model.addAttribute("aiAdvice", aiAdvice);
         model.addAttribute("city", weatherProperties.city());
 
         return "dashboard/index";

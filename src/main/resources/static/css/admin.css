@@ -568,3 +568,31 @@ h1 {
         padding: 18px;
     }
 }
+.ai-advice-block {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.ai-advice-description {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.ai-advice-result {
+    background: linear-gradient(135deg, #fff8d9 0%, #ffffff 100%);
+    border: 1px solid #f3e08a;
+    border-radius: 20px;
+    padding: 18px 20px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.05);
+}
+
+.ai-advice-result p {
+    margin: 0;
+    color: var(--text);
+    font-size: 17px;
+    line-height: 1.7;
+    font-weight: 500;
+    white-space: pre-line;
+}

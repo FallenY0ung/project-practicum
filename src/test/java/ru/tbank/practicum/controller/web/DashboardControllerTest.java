@@ -1,5 +1,6 @@
 package ru.tbank.practicum.controller.web;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -24,6 +25,7 @@ import ru.tbank.practicum.service.RadiatorRuleService;
 import ru.tbank.practicum.service.RadiatorService;
 import ru.tbank.practicum.service.ScheduleService;
 import ru.tbank.practicum.service.SmartHomeService;
+import ru.tbank.practicum.service.WeatherAdviceService;
 import ru.tbank.practicum.service.WeatherService;
 import ru.tbank.practicum.service.WeatherSyncService;
 
@@ -57,12 +59,16 @@ class DashboardControllerTest {
     @MockitoBean
     private WeatherProperties weatherProperties;
 
+    @MockitoBean
+    private WeatherAdviceService weatherAdviceService;
+
     @DisplayName("Должен открыть dashboard и положить данные в model")
     @Test
     void shouldReturnDashboardPage() throws Exception {
         Weather weather = new Weather();
 
         when(weatherService.getLatest()).thenReturn(weather);
+        when(weatherAdviceService.getAdvice(weather)).thenReturn("Надень куртку.");
         when(radiatorService.getAll()).thenReturn(List.of(new Radiator(), new Radiator()));
         when(blindsService.getAll()).thenReturn(List.of(new Blinds()));
         when(radiatorRuleService.getAll())
@@ -82,9 +88,86 @@ class DashboardControllerTest {
                 .andExpect(model().attribute("schedulesCount", 4))
                 .andExpect(model().attribute("weatherCount", 5))
                 .andExpect(model().attribute("latestWeather", weather))
+                .andExpect(model().attribute("aiAdvice", "Надень куртку."))
                 .andExpect(model().attribute("city", "Moscow"));
 
         verify(weatherService).getLatest();
+        verify(weatherAdviceService).getAdvice(weather);
+        verify(radiatorService).getAll();
+        verify(blindsService).getAll();
+        verify(radiatorRuleService).getAll();
+        verify(scheduleService).getAll();
+        verify(weatherService).getAll();
+        verify(weatherProperties).city();
+    }
+
+    @DisplayName("Должен открыть dashboard без aiAdvice, если погода не загрузилась")
+    @Test
+    void shouldReturnDashboardPageWithoutAiAdviceWhenWeatherLoadingFailed() throws Exception {
+        when(weatherService.getLatest()).thenThrow(new RuntimeException("Weather not available"));
+        when(radiatorService.getAll()).thenReturn(List.of(new Radiator(), new Radiator()));
+        when(blindsService.getAll()).thenReturn(List.of(new Blinds()));
+        when(radiatorRuleService.getAll())
+                .thenReturn(List.of(new RadiatorRule(), new RadiatorRule(), new RadiatorRule()));
+        when(scheduleService.getAll())
+                .thenReturn(List.of(new Schedule(), new Schedule(), new Schedule(), new Schedule()));
+        when(weatherService.getAll())
+                .thenReturn(List.of(new Weather(), new Weather(), new Weather(), new Weather(), new Weather()));
+        when(weatherProperties.city()).thenReturn("Moscow");
+
+        mockMvc.perform(get("/dashboard"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("dashboard/index"))
+                .andExpect(model().attribute("radiatorsCount", 2))
+                .andExpect(model().attribute("blindsCount", 1))
+                .andExpect(model().attribute("rulesCount", 3))
+                .andExpect(model().attribute("schedulesCount", 4))
+                .andExpect(model().attribute("weatherCount", 5))
+                .andExpect(model().attribute("latestWeather", (Object) null))
+                .andExpect(model().attribute("aiAdvice", (Object) null))
+                .andExpect(model().attribute("city", "Moscow"));
+
+        verify(weatherService).getLatest();
+        verify(radiatorService).getAll();
+        verify(blindsService).getAll();
+        verify(radiatorRuleService).getAll();
+        verify(scheduleService).getAll();
+        verify(weatherService).getAll();
+        verify(weatherProperties).city();
+    }
+
+    @DisplayName("Должен открыть dashboard и показать сообщение об ошибке, если aiAdvice не получен")
+    @Test
+    void shouldReturnDashboardPageWithFallbackAiAdviceWhenAdviceRequestFailed() throws Exception {
+        Weather weather = new Weather();
+
+        when(weatherService.getLatest()).thenReturn(weather);
+        when(weatherAdviceService.getAdvice(any(Weather.class)))
+                .thenThrow(new RuntimeException("OpenRouter error"));
+        when(radiatorService.getAll()).thenReturn(List.of(new Radiator(), new Radiator()));
+        when(blindsService.getAll()).thenReturn(List.of(new Blinds()));
+        when(radiatorRuleService.getAll())
+                .thenReturn(List.of(new RadiatorRule(), new RadiatorRule(), new RadiatorRule()));
+        when(scheduleService.getAll())
+                .thenReturn(List.of(new Schedule(), new Schedule(), new Schedule(), new Schedule()));
+        when(weatherService.getAll())
+                .thenReturn(List.of(new Weather(), new Weather(), new Weather(), new Weather(), new Weather()));
+        when(weatherProperties.city()).thenReturn("Moscow");
+
+        mockMvc.perform(get("/dashboard"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("dashboard/index"))
+                .andExpect(model().attribute("radiatorsCount", 2))
+                .andExpect(model().attribute("blindsCount", 1))
+                .andExpect(model().attribute("rulesCount", 3))
+                .andExpect(model().attribute("schedulesCount", 4))
+                .andExpect(model().attribute("weatherCount", 5))
+                .andExpect(model().attribute("latestWeather", weather))
+                .andExpect(model().attribute("aiAdvice", "Не удалось получить рекомендацию от ИИ."))
+                .andExpect(model().attribute("city", "Moscow"));
+
+        verify(weatherService).getLatest();
+        verify(weatherAdviceService).getAdvice(weather);
         verify(radiatorService).getAll();
         verify(blindsService).getAll();
         verify(radiatorRuleService).getAll();

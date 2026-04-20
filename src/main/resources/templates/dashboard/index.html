@@ -15,12 +15,6 @@
       <p class="subtitle">
         Единая точка входа для устройств, правил, расписаний, погоды и автоматизации.
       </p>
-
-      <div class="dashboard-hero__actions">
-        <a class="btn btn-primary" th:href="@{/radiators}">Радиаторы</a>
-        <a class="btn btn-secondary" th:href="@{/blinds}">Жалюзи</a>
-        <a class="btn btn-secondary" th:href="@{/weather}">Погода</a>
-      </div>
     </div>
 
     <div class="dashboard-orbit">
@@ -49,31 +43,49 @@
     <div class="stat-card">
       <span class="stat-title">Радиаторы</span>
       <span class="stat-value" th:text="${radiatorsCount}">0</span>
-      <a class="stat-link" th:href="@{/radiators}">Открыть раздел</a>
     </div>
 
     <div class="stat-card">
       <span class="stat-title">Жалюзи</span>
       <span class="stat-value" th:text="${blindsCount}">0</span>
-      <a class="stat-link" th:href="@{/blinds}">Открыть раздел</a>
     </div>
 
     <div class="stat-card">
       <span class="stat-title">Правила радиаторов</span>
       <span class="stat-value" th:text="${rulesCount}">0</span>
-      <a class="stat-link" th:href="@{/radiators}">Смотреть радиаторы</a>
     </div>
 
     <div class="stat-card">
       <span class="stat-title">Расписания жалюзи</span>
       <span class="stat-value" th:text="${schedulesCount}">0</span>
-      <a class="stat-link" th:href="@{/blinds}">Смотреть жалюзи</a>
     </div>
 
     <div class="stat-card">
       <span class="stat-title">Записи погоды</span>
       <span class="stat-value" th:text="${weatherCount}">0</span>
-      <a class="stat-link" th:href="@{/weather}">Открыть погоду</a>
+    </div>
+  </section>
+
+  <section class="card section-spacing">
+    <div class="card-header">
+      <h2>Разделы системы</h2>
+    </div>
+
+    <div class="menu-grid">
+      <a class="menu-card" th:href="@{/radiators}">
+        <span class="menu-card__title">Радиаторы</span>
+        <span class="menu-card__text">Устройства, состояния и правила радиаторов.</span>
+      </a>
+
+      <a class="menu-card" th:href="@{/blinds}">
+        <span class="menu-card__title">Жалюзи</span>
+        <span class="menu-card__text">Управление жалюзи и их расписаниями.</span>
+      </a>
+
+      <a class="menu-card" th:href="@{/weather}">
+        <span class="menu-card__title">Погода</span>
+        <span class="menu-card__text">История погодных записей и ручная синхронизация.</span>
+      </a>
     </div>
   </section>
 
@@ -161,27 +173,29 @@
     </section>
   </section>
 
-  <section class="card section-spacing">
-    <div class="card-header">
-      <h2>Навигация по системе</h2>
-    </div>
+  <section class="dashboard-grid">
+    <section class="card dashboard-panel">
+      <div class="card-header">
+        <h2>AI-совет по погоде</h2>
+      </div>
 
-    <div class="menu-grid">
-      <a class="menu-card" th:href="@{/radiators}">
-        <span class="menu-card__title">Радиаторы</span>
-        <span class="menu-card__text">Создание устройств, настройка состояний и правил.</span>
-      </a>
+      <div class="ai-advice-block">
+        <div th:if="${aiAdvice == null or #strings.isEmpty(aiAdvice)}">
+          <p class="ai-advice-description">
+            Здесь будет рекомендация от ИИ на основе текущей погоды:
+            что надеть, нужен ли зонт, насколько тепло одеваться и на что обратить внимание.
+          </p>
 
-      <a class="menu-card" th:href="@{/blinds}">
-        <span class="menu-card__title">Жалюзи</span>
-        <span class="menu-card__text">Управление состоянием жалюзи и их расписаниями.</span>
-      </a>
+          <div class="empty-state compact-empty">
+            <p>Совет пока не загружен.</p>
+          </div>
+        </div>
 
-      <a class="menu-card" th:href="@{/weather}">
-        <span class="menu-card__title">Погода</span>
-        <span class="menu-card__text">История погодных записей и ручная синхронизация.</span>
-      </a>
-    </div>
+        <div th:if="${aiAdvice != null and !#strings.isEmpty(aiAdvice)}" class="ai-advice-result">
+          <p th:text="${aiAdvice}"></p>
+        </div>
+      </div>
+    </section>
   </section>
 </div>
 </body>
