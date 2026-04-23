@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.tbank.practicum.entity.Blinds;
 import ru.tbank.practicum.enums.BlindsState;
 import ru.tbank.practicum.enums.EventSource;
+import ru.tbank.practicum.kafka.KafkaCommandProducer;
 import ru.tbank.practicum.repositories.BlindsRepository;
 import ru.tbank.practicum.repositories.ScheduleRepository;
 
@@ -30,11 +31,15 @@ class BlindsServiceUpdateFromFormTest {
     @Mock
     private ScheduleRepository scheduleRepository;
 
+    @Mock
+    private KafkaCommandProducer kafkaCommandProducer;
+
     private BlindsService blindsService;
 
     @BeforeEach
     void setUp() {
-        blindsService = spy(new BlindsService(blindsRepository, deviceEventService, logService, scheduleRepository));
+        blindsService = spy(new BlindsService(
+                blindsRepository, deviceEventService, logService, scheduleRepository, kafkaCommandProducer));
     }
 
     @DisplayName("Должен ничего не менять, если форма не содержит изменений")

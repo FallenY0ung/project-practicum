@@ -18,6 +18,7 @@ import ru.tbank.practicum.enums.DeviceType;
 import ru.tbank.practicum.enums.EventSource;
 import ru.tbank.practicum.enums.EventType;
 import ru.tbank.practicum.enums.LogStatus;
+import ru.tbank.practicum.kafka.KafkaCommandProducer;
 import ru.tbank.practicum.repositories.RadiatorRepository;
 import ru.tbank.practicum.repositories.RadiatorRuleRepository;
 
@@ -35,6 +36,9 @@ class RadiatorServiceTest {
 
     @Mock
     private RadiatorRuleRepository radiatorRuleRepository;
+
+    @Mock
+    private KafkaCommandProducer kafkaCommandProducer;
 
     @InjectMocks
     private RadiatorService radiatorService;
@@ -264,8 +268,8 @@ class RadiatorServiceTest {
     @DisplayName("Должен вызвать нужные методы в updateFromForm")
     @Test
     void shouldUpdateFromForm() {
-        RadiatorService spyService =
-                spy(new RadiatorService(radiatorRepository, deviceEventService, logService, radiatorRuleRepository));
+        RadiatorService spyService = spy(new RadiatorService(
+                radiatorRepository, deviceEventService, logService, radiatorRuleRepository, kafkaCommandProducer));
 
         Long id = 1L;
         EventSource source = EventSource.USER;

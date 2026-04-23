@@ -24,6 +24,7 @@ import ru.tbank.practicum.enums.DeviceType;
 import ru.tbank.practicum.enums.EventSource;
 import ru.tbank.practicum.enums.EventType;
 import ru.tbank.practicum.enums.LogStatus;
+import ru.tbank.practicum.kafka.KafkaCommandProducer;
 import ru.tbank.practicum.repositories.BlindsRepository;
 import ru.tbank.practicum.repositories.ScheduleRepository;
 
@@ -41,6 +42,9 @@ public class BlindsServiceTest {
 
     @Mock
     private ScheduleRepository scheduleRepository;
+
+    @Mock
+    private KafkaCommandProducer kafkaCommandProducer;
 
     @InjectMocks
     private BlindsService blindsService;
