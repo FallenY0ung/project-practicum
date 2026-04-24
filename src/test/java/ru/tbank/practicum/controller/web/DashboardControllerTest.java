@@ -142,8 +142,7 @@ class DashboardControllerTest {
         Weather weather = new Weather();
 
         when(weatherService.getLatest()).thenReturn(weather);
-        when(weatherAdviceService.getAdvice(any(Weather.class)))
-                .thenThrow(new RuntimeException("OpenRouter error"));
+        when(weatherAdviceService.getAdvice(any(Weather.class))).thenThrow(new RuntimeException("OpenRouter error"));
         when(radiatorService.getAll()).thenReturn(List.of(new Radiator(), new Radiator()));
         when(blindsService.getAll()).thenReturn(List.of(new Blinds()));
         when(radiatorRuleService.getAll())

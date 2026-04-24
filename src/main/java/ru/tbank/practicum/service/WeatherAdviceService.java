@@ -1,16 +1,15 @@
 package ru.tbank.practicum.service;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import ru.tbank.practicum.dto.OpenRouterChatRequest;
-import ru.tbank.practicum.dto.OpenRouterChatResponse;
-import ru.tbank.practicum.dto.OpenRouterProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import ru.tbank.practicum.dto.OpenRouterChatRequest;
+import ru.tbank.practicum.dto.OpenRouterChatResponse;
+import ru.tbank.practicum.dto.OpenRouterProperties;
 import ru.tbank.practicum.entity.Weather;
-
-import java.util.List;
 
 @Service
 @Slf4j
@@ -45,13 +44,12 @@ public class WeatherAdviceService {
                   "windSpeed": %s
                 }
                 """.formatted(
-                safe(weather.getName()),
-                weather.getTemp(),
-                weather.getFeelsLike(),
-                safe(weather.getDescription()),
-                weather.getHumidity(),
-                weather.getWindSpeed()
-        );
+                        safe(weather.getName()),
+                        weather.getTemp(),
+                        weather.getFeelsLike(),
+                        safe(weather.getDescription()),
+                        weather.getHumidity(),
+                        weather.getWindSpeed());
 
         String prompt = """
                 Ты помощник в приложении умного дома.
@@ -66,18 +64,18 @@ public class WeatherAdviceService {
         OpenRouterChatRequest request = new OpenRouterChatRequest(
                 properties.model(),
                 List.of(
-                        new OpenRouterChatRequest.Message("system",
-                                "Ты даешь краткие и практичные рекомендации по одежде по погоде."),
-                        new OpenRouterChatRequest.Message("user", prompt)
-                )
-        );
+                        new OpenRouterChatRequest.Message(
+                                "system", "Ты даешь краткие и практичные рекомендации по одежде по погоде."),
+                        new OpenRouterChatRequest.Message("user", prompt)));
 
         log.info("OpenRouter baseUrl={}", properties.baseUrl());
         log.info("OpenRouter model={}", properties.model());
-        log.info("OpenRouter apiKey present={}",
+        log.info(
+                "OpenRouter apiKey present={}",
                 properties.apiKey() != null && !properties.apiKey().isBlank());
 
-        OpenRouterChatResponse response = restClient.post()
+        OpenRouterChatResponse response = restClient
+                .post()
                 .uri("/chat/completions")
                 .body(request)
                 .retrieve()
