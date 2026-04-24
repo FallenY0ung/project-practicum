@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import ru.tbank.practicum.service.TelegramBotService;
 import ru.tbank.practicum.dto.telegram.TelegramGetUpdatesResponse;
 import ru.tbank.practicum.dto.telegram.TelegramMessage;
 import ru.tbank.practicum.dto.telegram.TelegramUpdate;
+import ru.tbank.practicum.service.TelegramBotService;
 import ru.tbank.practicum.service.TelegramCommandService;
 
 @Slf4j
@@ -19,8 +19,6 @@ public class TelegramPollingScheduler {
     private final TelegramCommandService telegramCommandService;
 
     private Long lastProcessedUpdateId = null;
-
-
 
     @Scheduled(fixedDelay = 5000)
     public void pollUpdates() {
@@ -34,7 +32,9 @@ public class TelegramPollingScheduler {
 
             log.info("Telegram response received: {}", response);
 
-            if (response == null || response.result() == null || response.result().isEmpty()) {
+            if (response == null
+                    || response.result() == null
+                    || response.result().isEmpty()) {
                 log.info("No updates from Telegram");
                 return;
             }
@@ -60,5 +60,4 @@ public class TelegramPollingScheduler {
             log.warn("Failed to poll Telegram updates", e);
         }
     }
-
 }

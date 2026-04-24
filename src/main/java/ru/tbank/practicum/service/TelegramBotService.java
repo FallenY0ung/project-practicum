@@ -8,8 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import ru.tbank.practicum.dto.telegram.TelegramProperties;
 import ru.tbank.practicum.dto.telegram.TelegramGetUpdatesResponse;
+import ru.tbank.practicum.dto.telegram.TelegramProperties;
 import ru.tbank.practicum.dto.telegram.TelegramSendMessageRequest;
 
 @Slf4j
@@ -42,21 +42,19 @@ public class TelegramBotService {
 
         log.info("Telegram getUpdates called, offset={}", offset);
 
-        TelegramGetUpdatesResponse response = restClient.get()
-                .uri(uri)
-                .retrieve()
-                .body(TelegramGetUpdatesResponse.class);
+        TelegramGetUpdatesResponse response =
+                restClient.get().uri(uri).retrieve().body(TelegramGetUpdatesResponse.class);
 
         log.info("Telegram getUpdates finished");
         return response;
     }
 
     public void sendMessage(Long chatId, String text) {
-        restClient.post()
+        restClient
+                .post()
                 .uri("/bot" + telegramProperties.botToken() + "/sendMessage")
                 .body(new TelegramSendMessageRequest(chatId, text))
                 .retrieve()
                 .toBodilessEntity();
     }
-
 }

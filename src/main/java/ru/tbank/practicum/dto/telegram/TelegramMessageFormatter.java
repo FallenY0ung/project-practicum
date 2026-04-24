@@ -24,13 +24,12 @@ public class TelegramMessageFormatter {
                 Влажность: %s %%
                 Ветер: %s м/с
                 """.formatted(
-                safe(weather.getName()),
-                weather.getTemp(),
-                weather.getFeelsLike(),
-                safe(weather.getDescription()),
-                weather.getHumidity(),
-                weather.getWindSpeed()
-        );
+                        safe(weather.getName()),
+                        weather.getTemp(),
+                        weather.getFeelsLike(),
+                        safe(weather.getDescription()),
+                        weather.getHumidity(),
+                        weather.getWindSpeed());
     }
 
     public String buildStatusMessage(Weather weather, List<Radiator> radiators, List<Blinds> blinds) {
