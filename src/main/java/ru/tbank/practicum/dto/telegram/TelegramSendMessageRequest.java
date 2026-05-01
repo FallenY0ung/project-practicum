@@ -1,3 +1,6 @@
 package ru.tbank.practicum.dto.telegram;
 
-public record TelegramSendMessageRequest(Long chat_id, String text) {}
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record TelegramSendMessageRequest(
+        @JsonProperty("chat_id") Long chatId, String text) {}

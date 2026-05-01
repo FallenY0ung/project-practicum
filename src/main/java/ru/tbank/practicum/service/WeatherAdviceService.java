@@ -1,5 +1,7 @@
 package ru.tbank.practicum.service;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -17,8 +19,10 @@ public class WeatherAdviceService {
 
     private final RestClient restClient;
     private final OpenRouterProperties properties;
+    private final Counter aiAdviceSuccessRequestsCounter;
+    private final Counter aiAdviceFailedRequestsCounter;
 
-    public WeatherAdviceService(OpenRouterProperties properties) {
+    public WeatherAdviceService(OpenRouterProperties properties, MeterRegistry meterRegistry) {
         this.properties = properties;
         this.restClient = RestClient.builder()
                 .baseUrl(properties.baseUrl())
@@ -27,6 +31,16 @@ public class WeatherAdviceService {
                 .defaultHeader("HTTP-Referer", properties.siteUrl())
                 .defaultHeader("X-OpenRouter-Title", properties.siteName())
                 .build();
+
+        this.aiAdviceSuccessRequestsCounter = Counter.builder("openrouter.ai.requests")
+                .description("Number of successful requests to OpenRouter AI for weather advice")
+                .tag("status", "success")
+                .register(meterRegistry);
+
+        this.aiAdviceFailedRequestsCounter = Counter.builder("openrouter.ai.requests")
+                .description("Number of failed requests to OpenRouter AI for weather advice")
+                .tag("status", "error")
+                .register(meterRegistry);
     }
 
     public String getAdvice(Weather weather) {
@@ -74,22 +88,28 @@ public class WeatherAdviceService {
                 "OpenRouter apiKey present={}",
                 properties.apiKey() != null && !properties.apiKey().isBlank());
 
-        OpenRouterChatResponse response = restClient
-                .post()
-                .uri("/chat/completions")
-                .body(request)
-                .retrieve()
-                .body(OpenRouterChatResponse.class);
+        try {
+            OpenRouterChatResponse response = restClient
+                    .post()
+                    .uri("/chat/completions")
+                    .body(request)
+                    .retrieve()
+                    .body(OpenRouterChatResponse.class);
 
-        if (response == null
-                || response.choices() == null
-                || response.choices().isEmpty()
-                || response.choices().get(0).message() == null
-                || response.choices().get(0).message().content() == null) {
-            return "Не удалось получить совет от ИИ.";
+            if (response == null
+                    || response.choices() == null
+                    || response.choices().isEmpty()
+                    || response.choices().get(0).message() == null
+                    || response.choices().get(0).message().content() == null) {
+                return "Не удалось получить совет от ИИ.";
+            }
+
+            aiAdviceSuccessRequestsCounter.increment();
+            return response.choices().get(0).message().content().trim();
+        } catch (Exception e) {
+            aiAdviceFailedRequestsCounter.increment();
+            throw e;
         }
-
-        return response.choices().get(0).message().content().trim();
     }
 
     private String safe(String value) {
