@@ -46,11 +46,17 @@ services:
       kafka:
         condition: service_started
     environment:
+      JAVA_TOOL_OPTIONS: "-Djava.net.preferIPv4Stack=true -Djava.net.preferIPv6Addresses=false"
       DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
       DB_USERNAME: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       SPRING_LIQUIBASE_ENABLED: "false"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9093
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     ports:
       - "8080:8080"
     restart: unless-stopped
@@ -88,5 +94,26 @@ services:
     depends_on:
       - kafka
 
+  prometheus:
+    image: prom/prometheus
+    container_name: homeapp-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - app
+
+  grafana:
+    image: grafana/grafana
+    container_name: homeapp-grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana_data:/var/lib/grafana
+
 volumes:
   postgres_data:
+  grafana_data:
