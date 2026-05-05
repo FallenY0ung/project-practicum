@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-postgres
+  name: {{ .Chart.Name }}-postgres
 spec:
   selector:
-    app: {{ .Release.Name }}-postgres
+    app: {{ .Chart.Name }}-postgres
   ports:
     - name: postgres
       port: 5432
@@ -13,7 +13,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-postgres-pvc
+  name: {{ .Chart.Name }}-postgres-pvc
 spec:
   accessModes:
     - ReadWriteOnce
@@ -24,16 +24,16 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-postgres
+  name: {{ .Chart.Name }}-postgres
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-postgres
+      app: {{ .Chart.Name }}-postgres
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-postgres
+        app: {{ .Chart.Name }}-postgres
     spec:
       containers:
         - name: postgres
@@ -45,17 +45,17 @@ spec:
             - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secret
+                  name: {{ .Chart.Name }}-secret
                   key: POSTGRES_DB
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secret
+                  name: {{ .Chart.Name }}-secret
                   key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secret
+                  name: {{ .Chart.Name }}-secret
                   key: POSTGRES_PASSWORD
           volumeMounts:
             - name: postgres-data
@@ -71,4 +71,4 @@ spec:
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-postgres-pvc
+            claimName: {{ .Chart.Name }}-postgres-pvc

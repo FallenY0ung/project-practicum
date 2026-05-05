@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-kafka
+  name: {{ .Chart.Name }}-kafka
 spec:
   selector:
-    app: {{ .Release.Name }}-kafka
+    app: {{ .Chart.Name }}-kafka
   ports:
     - name: kafka
       port: 9092
@@ -13,16 +13,16 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-kafka
+  name: {{ .Chart.Name }}-kafka
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-kafka
+      app: {{ .Chart.Name }}-kafka
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-kafka
+        app: {{ .Chart.Name }}-kafka
     spec:
       containers:
         - name: kafka
@@ -35,7 +35,7 @@ spec:
             - name: KAFKA_LISTENERS
               value: CONTROLLER://localhost:9091,PLAINTEXT://0.0.0.0:9092
             - name: KAFKA_ADVERTISED_LISTENERS
-              value: PLAINTEXT://{{ .Release.Name }}-kafka:9092
+              value: PLAINTEXT://{{ .Chart.Name }}-kafka:9092
             - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
               value: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
             - name: KAFKA_NODE_ID

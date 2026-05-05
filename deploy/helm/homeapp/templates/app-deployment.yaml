@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-app
+  name: {{ .Chart.Name }}-app
 spec:
   replicas: {{ .Values.app.replicas }}
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-app
+      app: {{ .Chart.Name }}-app
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-app
+        app: {{ .Chart.Name }}-app
     spec:
       containers:
         - name: app
@@ -21,31 +21,31 @@ spec:
           env:
             - name: JAVA_TOOL_OPTIONS
               value: "-Djava.net.preferIPv4Stack=true -Djava.net.preferIPv6Addresses=false"
-            - name: DB_URL
-              value: jdbc:postgresql://{{ .Release.Name }}-postgres:5432/{{ .Values.postgres.database }}
-            - name: DB_USERNAME
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://{{ .Chart.Name }}-postgres:5432/{{ .Values.postgres.database }}
+            - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secret
+                  name: {{ .Chart.Name }}-secret
                   key: POSTGRES_USER
-            - name: DB_PASSWORD
+            - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secret
+                  name: {{ .Chart.Name }}-secret
                   key: POSTGRES_PASSWORD
             - name: SPRING_LIQUIBASE_ENABLED
               value: "false"
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: {{ .Release.Name }}-kafka:9092
+              value: {{ .Chart.Name }}-kafka:9092
             - name: OPENROUTER_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secret
+                  name: {{ .Chart.Name }}-secret
                   key: OPENROUTER_API_KEY
             - name: TELEGRAM_BOT_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secret
+                  name: {{ .Chart.Name }}-secret
                   key: TELEGRAM_BOT_TOKEN
           readinessProbe:
             httpGet:

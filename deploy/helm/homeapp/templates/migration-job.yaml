@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Release.Name }}-migrations
+  name: {{ .Chart.Name }}-migrations
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation
@@ -16,16 +16,16 @@ spec:
           imagePullPolicy: {{ .Values.migrations.image.pullPolicy }}
           env:
             - name: LIQUIBASE_COMMAND_URL
-              value: jdbc:postgresql://{{ .Release.Name }}-postgres:5432/{{ .Values.postgres.database }}
+              value: jdbc:postgresql://{{ .Chart.Name }}-postgres:5432/{{ .Values.postgres.database }}
             - name: LIQUIBASE_COMMAND_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secret
+                  name: {{ .Chart.Name }}-secret
                   key: POSTGRES_USER
             - name: LIQUIBASE_COMMAND_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-secret
+                  name: {{ .Chart.Name }}-secret
                   key: POSTGRES_PASSWORD
           command:
             - /bin/sh
