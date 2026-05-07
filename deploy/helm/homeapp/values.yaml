@@ -1,0 +1,35 @@
+app:
+  image:
+    repository: homeapp
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicas: 1
+  service:
+    type: NodePort
+    port: 8080
+
+migrations:
+  image:
+    repository: homeapp-migrations
+    tag: latest
+    pullPolicy: IfNotPresent
+
+postgres:
+  image:
+    repository: postgres
+    tag: "18"
+    pullPolicy: IfNotPresent
+  database: homeapp
+  username: postgres
+  password: postgres
+  storage: 1Gi
+
+kafka:
+  image:
+    repository: apache/kafka
+    tag: "4.1.2"
+    pullPolicy: IfNotPresent
+
+secrets:
+  openrouterApiKey: ""
+  telegramBotToken: ""
